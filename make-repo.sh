@@ -25,7 +25,7 @@ CONF_FILE="make-repo.conf"
 ### functions ###
 get_version() {
     local name
-    name=`ls $RPMDIR | grep -v "src\.rpm" | grep "^$1-[0-9].*\.rpm" | cut -d "-" -f 2- | sed "s/\.el6.*//g"`
+    name=`ls $RPMDIR | grep -v "src\.rpm" | grep "^$1-[0-9].*\.rpm" | sed "s/^$1-//g" | sed "s/\.x86_64.*//g" | sed "s/\.noarch.*//g"`
     if [ ! -n "$name" ]; then
         echo "$1 file not found" >&2
         exit 1
