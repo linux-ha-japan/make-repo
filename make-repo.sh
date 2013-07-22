@@ -33,13 +33,13 @@ get_version() {
     echo "$name"
 }
 
-### make pacemaker-set.spec file ###
+### make pacemaker-all.spec file ###
 make_pacemaker_set_sepc() {
     local pkg
     local version
 
     cat > $SET_SPEC_FILE <<END
-Name: pacemaker-set
+Name: pacemaker-all
 Version: ${rpm_ver}
 Release: ${rpm_release}%{?dist}
 Summary: pacemaker set
@@ -141,8 +141,8 @@ make_pacemaker_set() {
     local rpmfile
 
     make_pacemaker_set_sepc
-    ### build pacemaker-set ###
-    echo "building pacemaker-set ...."
+    ### build pacemaker-all ###
+    echo "building pacemaker-all ...."
     rpmfile=`LANG=C rpmbuild -bb $SET_SPEC_FILE | grep "Wrote:" | cut -d ":" -f 2`
     if [ ! -n "$rpmfile" ]; then
         echo "rpmbuild failed"
@@ -151,7 +151,7 @@ make_pacemaker_set() {
 
     echo
 
-    rm -f $REPO_DIR/rpm/pacemaker-set*rpm
+    rm -f $REPO_DIR/rpm/pacemaker-all*rpm
     echo "mv $rpmfile ."
     mv $rpmfile $REPO_DIR/rpm/
 }
@@ -375,7 +375,7 @@ if [ ! -n "$1" ] || [ ! -d "$1" ]; then
 fi
 
 # gloval params
-SET_SPEC_FILE="pacemaker-set.spec"
+SET_SPEC_FILE="pacemaker-all.spec"
 REPO_SPEC_FILE="pacemaker-repo.spec"
 YUM_CONF_FILE="pacemaker.repo"
 RPMDIR=`echo $1 | sed 's#/\$##g'`
