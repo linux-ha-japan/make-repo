@@ -7,7 +7,7 @@ Group: System Environment/Base
 BuildArch: noarch
 BuildRequires: python2-devel
 Summary: Pacemaker Configuration System	
-Source0: http://people.redhat.com/cfeist/pcs/pcs-%{version}.tar.gz
+Source0: pcs-%{version}.tar.gz
 
 Requires: pacemaker ccs	
 

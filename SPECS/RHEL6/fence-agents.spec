@@ -15,91 +15,13 @@
 
 Name: fence-agents
 Summary: Fence Agents for Red Hat Cluster
-Version: 3.1.5
-Release: 35%{?alphatag:.%{alphatag}}%{?dist}
+Version: 4.0.10
+Release: 1%{?alphatag:.%{alphatag}}%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
 URL: http://sources.redhat.com/cluster/wiki/
-Source0: https://fedorahosted.org/releases/f/e/fence-agents/%{name}-%{version}.tar.bz2
+Source0: fence-agents/%{name}-%{version}.tar.bz2
 
-Patch0: bz698365-add_rha_name_and_rha_description_tag_to_relaxng_xsl.patch
-Patch1: bz461948-1-fence_kdump_new_fence_agent.patch
-Patch2: bz461948-2-build_update_configure_ac_to_include_fence_kdump.patch
-Patch3: bz461948-3-build_update_configure_ac_add_extra_checks_for_fence_kdump.patch
-Patch4: bz461948-4-fence_kdump_fix_compiler_warnings.patch
-Patch5: bz461948-5-fence_kdump_fix_more_compiler_warnings.patch
-Patch6: bz461948-6-fence_kdump_drop_unused_protocol_definition.patch
-Patch7: bz461948-7-fence_kdump_increase_default_timeout.patch
-# Patch8 is disabled on purpose. Patch7 (in git) introduced binary files
-# and 8 removes them, but git show SHA1 does not include binary output
-# making 8 an empty patch that will fail to apply
-# for consistency with git history the patch is here but not applied
-Patch8: bz461948-8-fence_kdump_drop_binaries.patch
-Patch9: bz461948-9-fence_kdump_fix_logging.patch
-Patch10: bz461948-10-fence_kdump_restore_original_default_timeout.patch
-Patch11: bz461948-11-fence_kdump_fix_metadata.patch
-Patch12: bz718924-drac5_firmware_does_not_close_ssh_session.patch
-Patch13: bz731166-fence_rhevm_change_UP_status_to_up_state_as_the_REST.patch
-Patch14: bz731166-2-fence_rhevm_REST_API_URL_updated.patch
-Patch15: bz732372-fence_ipmilan_exposes_user_password.patch
-Patch16: bz726571-fence_ipmilan_should_honor_L_option.patch
-Patch17: bz734429-fence_kdump-fix-potential-null-dereference.patch
-Patch18: bz739384-fence_scsi-fix_simultaneous_unfence_operations.patch
-Patch19: bz741339-fence_scsi-remove_unlink_of_fence_scsi_dev_file.patch
-Patch20: bz740484-1-fence_ipmilan-parsing_args_for_passwd_script.patch
-Patch21: bz742003-1-fence_rsb-rewrite_fence_agent.patch
-Patch22: bz769681-1-fence_rhevm-incorrect_status.patch
-Patch23: bz771211-1-fence_vmware_soap-Support-for-alias-names-as-ports.patch
-Patch24: bz771936-1-fence_ipmilan-Possible-buffer-overflow.patch
-Patch25: bz772597-1-fence_vmware_soap-Support-for-100-VM-in-VMWare.patch
-Patch26: bz787706-fence_ipmilan_does_not_respect_power_wait.patch
-Patch27: bz785091-Missing_password_is_not_reported_properly.patch
-Patch28: bz714841-1-fence_agent_metadata.patch
-Patch29: bz714841-2-fence_agent_metadata.patch
-Patch30: bz714841-3-fence_agent_metadata.patch
-Patch31: bz804169-using_delay_option_can_ends_with_timeout.patch
-Patch32: bz804169-2-using_delay_option_can_ends_with_timeout.patch
-Patch33: bz806883-attribute_unique_should_be_set_to_0.patch
-Patch34: bz806897-fence_ipmilan-return_code_can_be_invalid.patch
-Patch35: bz806912-fence_ipmilan_typo.patch
-Patch36: bz804805-fence_node_fences_instead_of_unfencing.patch
-Patch37: bz752449-1-fence_eaton_snmp_fix_default_power_wait_option_value.patch
-Patch38: bz752449-2-fence_eaton_snmp_add_tested_models.patch
-Patch39: bz825667-fence_scsi_add_metadata_action_to_man_page.patch
-Patch40: bz822507-fix_unique_attributes.patch
-Patch41: bz842314-eol_detection.patch
-Patch42: bz818337-1-fence_hpblade.patch
-Patch43: bz818337-2-fix_distman.patch
-Patch44: bz740869-1-fence_ipdu.patch
-Patch45: bz740869-2-fence_ipdu.patch
-Patch46: bz800650-1-fence_symlink.patch
-Patch47: bz800650-2-fence_symlink.patch
-Patch48: bz769798-fence_vmware_soap-Faster_fencing.patch
-Patch49: bz863568-fence_rhevm_new_api_rhevm.patch
-Patch50: bz837174-add_action_metadata_to_rest_of_agents.patch
-Patch51: bz863568-2-fence_rhevm_new_api_rhevm.patch
-Patch52: bz837174-fence_scsi_allow_action_metadata_stdin.patch
-Patch53: bz905478-fence_drac5-regression.patch
-Patch54: bz902404-fence_vmware_soap-traceback_when_hostname_cannot_be_resolved.patch
-Patch55: bz872308-fix_manual_page_for_ilo3_ilo4.patch
-Patch56: bz896603-fence_cisco_ucs-respect_delay.patch
-Patch57: bz887349-fence_scsi-add_unfence_to_man_page.patch
-Patch58: bz912773-fence_scsi-delay.patch
-Patch59: bz886614-fence_apc-firmware5-1.patch
-Patch60: bz886614-fence_apc-firmware5-2.patch
-Patch61: bz978326-fence_cisco_ucs-cannot_resolve_hostname.patch
-Patch62: bz978325-fence_cisco_ucs-incorrect_timeout_used.patch
-Patch63: bz917675-1-remove_static_metadata.patch
-Patch64: bz917675-2-remove_static_metadata.patch
-Patch65: bz959490-password_validation.patch
-Patch66: bz870269-fence_ilo4.patch
-Patch67: bz981086-fence_ipmilan-lanplus.patch
-Patch68: bz912773-2-delay_into_manual_page.patch
-Patch69: bz994186-error_in_xml.patch
-Patch70: bz886614-2-improve_detection_eol.patch
-Patch71: bz978325-fence_cisco_ucs-login_timeout.patch
-Patch72: bz997416-fence_bladecenter-login.patch
-Patch73: bz1014000-fence_vmware_soap-suds.patch
 
 ExclusiveArch: i686 x86_64
 
@@ -107,7 +29,7 @@ ExclusiveArch: i686 x86_64
 %global supportedagents apc apc_snmp bladecenter brocade cisco_mds cisco_ucs drac drac5 eaton_snmp eps hpblade kdump ibmblade ifmib ilo ilo_mp intelmodular ipdu ipmilan manual rhevm rsb scsi wti vmware_soap
 %global deprecated rsa sanbox2
 %global testagents virsh vmware
-%global requiresthirdparty egenera
+%global requiresthirdparty %{nil}
 
 ## Runtime deps
 Requires: sg3_utils telnet openssh-clients
@@ -140,81 +62,6 @@ BuildRequires: net-snmp-utils perl-Net-Telnet
 %prep
 %setup -q -n %{name}-%{version}
 
-%patch0 -p1 -b .bz698365.1
-%patch1 -p1 -b .bz461948.1
-%patch2 -p1 -b .bz461948.2
-%patch3 -p1 -b .bz461948.3
-%patch4 -p1 -b .bz461948.4
-%patch5 -p1 -b .bz461948.5
-%patch6 -p1 -b .bz461948.6
-%patch7 -p1 -b .bz461948.7
-#%patch8 -p1 -b .bz461948.8
-# see above why patch8 is not applied!
-%patch9 -p1 -b .bz461948.9
-%patch10 -p1 -b .bz461948.10
-%patch11 -p1 -b .bz461948.11
-%patch12 -p1 -b .bzbz718924.1
-%patch13 -p1 -b .bz731166.1
-%patch14 -p1 -b .bz731166.2
-%patch15 -p1 -b .bz732372.1
-%patch16 -p1 -b .bz726571.1
-%patch17 -p1 -b .bz734429.1
-%patch18 -p1 -b .bz739384.1
-%patch19 -p1 -b .bz741339-1
-%patch20 -p1 -b .bz740484.1
-%patch21 -p1 -b .bz742003.1
-%patch22 -p1 -b .bz769681.1
-%patch23 -p1 -b .bz771211.1
-%patch24 -p1 -b .bz771936.1
-%patch25 -p1 -b .bz772597.1
-%patch26 -p1 -b .bz787706
-%patch27 -p1 -b .bz785091
-%patch28 -p1 -b .bz714841.1
-%patch29 -p1 -b .bz714841.2
-%patch30 -p1 -b .bz714841.3
-%patch31 -p1 -b .bz804169.1
-%patch32 -p1 -b .bz804619.2
-%patch33 -p1 -b .bz806883.1
-%patch34 -p1 -b .bz806897.1
-%patch35 -p1 -b .bz806912.1
-%patch36 -p1 -b .bz804805.1
-%patch37 -p1 -b .bz752449.1
-%patch38 -p1 -b .bz752449.2
-%patch39 -p1 -b .bz825667.1
-%patch40 -p1 -b .bz822507.1
-%patch41 -p1 -b .bz842314.1
-%patch42 -p1 -b .bz818337.1
-%patch43 -p1 -b .bz818337.2
-%patch44 -p1 -b .bz740869.1
-%patch45 -p1 -b .bz740869.2
-%patch46 -p1 -b .bz800650.1
-%patch47 -p1 -b .bz800650.2
-%patch48 -p1 -b .bz769798.1
-%patch49 -p1 -b .bz863568.1
-%patch50 -p1 -b .bz837174.1
-%patch51 -p1 -b .bz863568.2
-%patch52 -p1 -b .bz837174.2
-%patch53 -p1 -b .bz905478.1
-%patch54 -p1 -b .bz902404.1
-%patch55 -p1 -b .bz872308.1
-%patch56 -p1 -b .bz896603.1
-%patch57 -p1 -b .bz887349.1
-%patch58 -p1 -b .bz912773.1
-%patch59 -p1 -b .bz886614.1
-%patch60 -p1 -b .bz886614.2
-%patch61 -p1 -b .bz978326.1
-%patch62 -p1 -b .bz978325.1
-%patch63 -p1 -b .bz917675.1
-%patch64 -p1 -b .bz917675.2
-%patch65 -p1 -b .bz959490.1
-%patch66 -p1 -b .bz870269.1
-%patch67 -p1 -b .bz981086.1
-%patch68 -p1 -b .bz912773.2
-%patch69 -p1 -b .bz994186.1
-%patch70 -p1 -b .bz886614.2
-%patch71 -p1 -b .bz978325.2
-%patch72 -p1 -b .bz997416.1
-%patch73 -p1 -b .bz1014000.1
 
 %build
 ./autogen.sh
@@ -250,6 +97,7 @@ power management for several devices.
 %defattr(-,root,root,-)
 %doc doc/COPYING.* doc/COPYRIGHT doc/README.licence
 %{_sbindir}/fence*
+%{_libexecdir}/fence*
 %{_datadir}/fence
 %{_datadir}/cluster
 %{_mandir}/man8/fence*
