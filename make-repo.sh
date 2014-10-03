@@ -387,7 +387,21 @@ COMPRESS_DIR=""
 
 make_pacemaker_repo
 make_pacemaker_debuginfo_repo
-#make_pacemaker_src_repo
+make_pacemaker_src_repo
 compress_dir
+
+# print total number of packages
+set -- $BIN_FILES
+num_bin=$#
+set -- $DEBUG_FILES
+num_debug=$#
+set -- $SRC_FILES
+num_src=$#
+
+echo "Total number of packages"
+echo " BIN_FILES   : $num_bin"
+echo " DEBUG_FILES : $num_debug"
+echo " SRC_FILES   : $num_src"
+
 
 echo "done"
