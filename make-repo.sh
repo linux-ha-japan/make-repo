@@ -240,7 +240,7 @@ mkdir_and_cp_pacemaker_repo() {
             exit 1
         fi
         if [ `echo -e "$filename" | wc -l` -ge 2 ]; then
-            "multiple $i file found"    
+            echo "multiple $i file found"
             exit 1
         fi
         echo "copy $filename"
@@ -387,7 +387,7 @@ COMPRESS_DIR=""
 
 make_pacemaker_repo
 make_pacemaker_debuginfo_repo
-make_pacemaker_src_repo
+#make_pacemaker_src_repo
 compress_dir
 
 echo "done"
