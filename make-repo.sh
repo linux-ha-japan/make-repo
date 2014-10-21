@@ -240,7 +240,7 @@ mkdir_and_cp_pacemaker_repo() {
             exit 1
         fi
         if [ `echo -e "$filename" | wc -l` -ge 2 ]; then
-            "multiple $i file found"    
+            echo "multiple $i file found"
             exit 1
         fi
         echo "copy $filename"
@@ -389,5 +389,19 @@ make_pacemaker_repo
 make_pacemaker_debuginfo_repo
 make_pacemaker_src_repo
 compress_dir
+
+# print total number of packages
+set -- $BIN_FILES
+num_bin=$#
+set -- $DEBUG_FILES
+num_debug=$#
+set -- $SRC_FILES
+num_src=$#
+
+echo "Total number of packages"
+echo " BIN_FILES   : $num_bin"
+echo " DEBUG_FILES : $num_debug"
+echo " SRC_FILES   : $num_src"
+
 
 echo "done"
