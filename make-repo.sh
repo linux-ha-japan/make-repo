@@ -344,6 +344,12 @@ if [ ! -f $CONF_FILE ]; then
     exit 1
 fi
 
+buildsrc=true
+if [ "$1" = "--nosrc" ]; then
+    buildsrc=false
+    shift
+fi
+
 ### read configuration ###
 source $CONF_FILE
 
@@ -387,7 +393,7 @@ COMPRESS_DIR=""
 
 make_pacemaker_repo
 make_pacemaker_debuginfo_repo
-make_pacemaker_src_repo
+$buildsrc && make_pacemaker_src_repo
 compress_dir
 
 # print total number of packages
