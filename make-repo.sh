@@ -355,6 +355,13 @@ source $CONF_FILE
 
 
 ### validate ###
+# if dist was not specified then use the system default
+#  $dist is without a period character in this script.
+if [ -z "$dist" ]; then
+ dist=`rpmbuild --eval %{dist} | sed 's/^\.//'`
+ echo "Use dist='$dist'"
+fi
+
 if [ ! -n "$rpm_ver" ] || [ ! -n "$rpm_release" ] || [ ! -n "$dist" ] ; then
     echo "Please specify rpm_ver and rpm_release and dist." >&2
     echo "Example: rpm_ver=\"1.1.10\" rpm_release=\"1.1\" dist=\"el6\" $0 [rpm_dir]"
@@ -385,9 +392,9 @@ SET_SPEC_FILE="pacemaker-all.spec"
 REPO_SPEC_FILE="pacemaker-repo.spec"
 YUM_CONF_FILE="pacemaker.repo"
 RPMDIR=`echo $1 | sed 's#/\$##g'`
-REPO_DIR="pacemaker-repo-${rpm_ver}-${rpm_release}.el6.x86_64"
-REPO_SRC_DIR="pacemaker-src-${rpm_ver}-${rpm_release}.el6.x86_64"
-REPO_DEBUG_DIR="pacemaker-debuginfo-${rpm_ver}-${rpm_release}.el6.x86_64" 
+REPO_DIR="pacemaker-repo-${rpm_ver}-${rpm_release}.${dist}.x86_64"
+REPO_SRC_DIR="pacemaker-src-${rpm_ver}-${rpm_release}.${dist}.x86_64"
+REPO_DEBUG_DIR="pacemaker-debuginfo-${rpm_ver}-${rpm_release}.${dist}.x86_64"
 COMPRESS_DIR=""
 
 
