@@ -350,10 +350,6 @@ if [ "$1" = "--nosrc" ]; then
     shift
 fi
 
-### read configuration ###
-source $CONF_FILE
-
-
 ### validate ###
 # if dist was not specified then use the system default
 #  $dist is without a period character in this script.
@@ -367,6 +363,10 @@ if [ ! -n "$rpm_ver" ] || [ ! -n "$rpm_release" ] || [ ! -n "$dist" ] ; then
     echo "Example: rpm_ver=\"1.1.10\" rpm_release=\"1.1\" dist=\"el6\" $0 [rpm_dir]"
     exit 1
 fi
+
+### read configuration ###
+source $CONF_FILE
+
 
 if [ ! -n "$BIN_FILES" ] || [ ! -n "$DEBUG_FILES" ] || [ ! -n "$SRC_FILES" ] ; then
     echo "Conf file is invalid." >&2
