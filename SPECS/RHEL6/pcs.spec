@@ -9,7 +9,7 @@ BuildRequires: python2-devel
 Summary: Pacemaker Configuration System	
 Source0: pcs-%{version}.tar.gz
 
-Requires: pacemaker ccs	
+Requires: pacemaker
 
 %description
 pcs is a corosync and pacemaker configuration tool.  It permits users to
