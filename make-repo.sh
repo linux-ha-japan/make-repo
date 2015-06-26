@@ -25,12 +25,40 @@ CONF_FILE="make-repo.conf"
 ### functions ###
 get_version() {
     local name
-    name=`ls $RPMDIR | grep -v "src\.rpm" | grep "^$1-[0-9].*\.rpm" | sed "s/^$1-//g" | sed "s/\.x86_64.*//g" | sed "s/\.noarch.*//g"`
+    name=`find $RPMDIRS -maxdepth 1 -type f | grep -v "src\.rpm" | grep "/$1-[0-9].*\.rpm" | sed "s/^.*\/$1-//g" | sed "s/\.x86_64.*//g" | sed "s/\.noarch.*//g"`
     if [ ! -n "$name" ]; then
         echo "$1 file not found" >&2
         exit 1
     fi
     echo "$name"
+}
+get_filename_rpm() {
+    local rpmname="$1"
+    local filename=""
+    filename=`find $RPMDIRS -maxdepth 1 -type f | grep -v "src\.rpm" | grep "$rpmname-[0-9].*\.rpm"`
+    if [ $? -ne 0 ]; then
+        echo "$rpmname file not found" >&2
+        exit 1
+    fi
+    if [ `echo -e "$filename" | wc -l` -ge 2 ]; then
+        echo "multiple $rpmname file found: $filename" >&2
+        exit 1
+    fi
+    echo "$filename"
+}
+get_filename_srpm() {
+    local rpmname="$1"
+    local filename=""
+    filename=`find $SRPMDIR -maxdepth 1 -type f | grep "$i-[0-9].*src\.rpm"`
+    if [ $? -ne 0 ]; then
+        echo "$rpmname src file not found" >&2
+        exit 1
+    fi
+    if [ `echo -e "$filename" | wc -l` -ge 2 ]; then
+        echo "multiple $rpmname file found: $filename" >&2
+        exit 1
+    fi
+    echo "$filename"
 }
 
 ### make pacemaker-all.spec file ###
@@ -234,17 +262,10 @@ mkdir_and_cp_pacemaker_repo() {
     ### make main repository dir ###
     mkdir -p $REPO_DIR/rpm
     for i in $BIN_FILES; do
-        filename=`ls $RPMDIR | grep -v "src\.rpm" | grep "$i-[0-9].*\.rpm"`
-        if [ $? -ne 0 ]; then
-            echo "$i file not found" >&2 
-            exit 1
-        fi
-        if [ `echo -e "$filename" | wc -l` -ge 2 ]; then
-            echo "multiple $i file found"
-            exit 1
-        fi
+        filename=`get_filename_rpm $i`
+	if [ $? -ne 0 ]; then exit 1; fi
         echo "copy $filename"
-        cp $RPMDIR/$filename $REPO_DIR/rpm/
+        cp $filename $REPO_DIR/rpm/
     done
     chown root:root -R $REPO_DIR
     chmod 644 $REPO_DIR/rpm/*
@@ -285,17 +306,10 @@ make_pacemaker_debuginfo_repo() {
 
     mkdir $REPO_DEBUG_DIR
     for i in $DEBUG_FILES; do
-        filename=`ls $RPMDIR | grep -v "src\.rpm" | grep "$i-[0-9].*\.rpm"`
-        if [ $? -ne 0 ]; then
-            echo "$i file not found" >&2 
-            exit 1
-        fi
-        if [ `echo -e "$filename" | wc -l` -ge 2 ]; then
-            echo "multiple $i file found"    
-            exit 1
-        fi
+        filename=`get_filename_rpm $i`
+	if [ $? -ne 0 ]; then exit 1; fi
         echo "copy $filename"
-        cp $RPMDIR/$filename $REPO_DEBUG_DIR
+        cp $filename $REPO_DEBUG_DIR
     done
     COMPRESS_DIR="$COMPRESS_DIR $REPO_DEBUG_DIR"
 }
@@ -308,17 +322,10 @@ make_pacemaker_src_repo() {
 
     mkdir $REPO_SRC_DIR
     for i in $SRC_FILES; do
-        filename=`ls $RPMDIR | grep "$i-[0-9].*src\.rpm"`
-        if [ $? -ne 0 ]; then
-            echo "$i src file not found" >&2 
-            exit 1
-        fi
-        if [ `echo -e "$filename" | wc -l` -ge 2 ]; then
-            "multiple $i file found"    
-            exit 1
-        fi
+        filename=`get_filename_srpm $i`
+	if [ $? -ne 0 ]; then exit 1; fi
         echo "copy $filename"
-        cp $RPMDIR/$filename $REPO_SRC_DIR
+        cp $filename $REPO_SRC_DIR
     done
     COMPRESS_DIR="$COMPRESS_DIR $REPO_SRC_DIR"
 }
@@ -338,17 +345,83 @@ compress_dir() {
 }
 
 
+usage() {
+    echo "$0: [-r|--release RELSPEC] [-R|--rpmbuilddir] [rpm_dir]"
+    echo "  -r|--release RELSPEC: repository package version"
+    echo "      format: RELSPEC=\${rpm_ver}-\${rpm_release}"
+    echo "  -R|--rpmbuilddir: build under $HOME/rpmbuild directory for packaging"
+    echo "      The following directories are used instead of the current directory or [rpm_dir]."
+    echo "         $HOME/rpmbuild/REPOPKG: the output repository packages"
+    echo "         $HOME/rpmbuild/RPMS   : binary rpms to be packaged"
+    echo "                                 (x86_64 and noarch only; no i386 support yet)"
+    echo "         $HOME/rpmbuild/SRPMS  : source rpms to be packaged"
+    echo "  --nosrc: skip building source packages for development"
+    echo
+    echo "Example 1: $0 -r \"1.1.13-1.1\" -R"
+    echo "Example 2: rpm_ver=\"1.1.10\" rpm_release=\"1.1\" dist=\"el6\" $0 [rpm_dir]"
+}
+
 ### main ######################################################################
-if [ ! -f $CONF_FILE ]; then
-    echo "$CONF_FILE not found" >&2
+
+# configurable options
+RPMDIRS=""
+SRPMDIR=""
+REPO_OUTPUT_DIR=""
+RELSPEC=""
+opt_rpmdir=""
+use_rpmbuiddir=false
+buildsrc=true
+
+### parse options ###
+OPT=`getopt -o r:R --long release:,rpmbuilddir,nosrc,help -- "$@"`
+if [ $? != 0 ] ; then
+  exit 1
+fi
+eval set -- "$OPT"
+
+while true; do
+  case "$1" in
+      -r|--release) RELSPEC="$2"; echo "WARN: Not implemented yet: -r|--release" 1>&2; shift; shift;;
+      -R|--rpmbuilddir) use_rpmbuilddir=true; shift;;
+      --nosrc) buildsrc=false; shift;;
+      --help) usage; exit 0;;
+      --) shift; break;;
+      *) echo "Unknown option: $1" 1>&2; usage; exit 1;;
+  esac
+done
+if [ -n "$1" ]; then
+    opt_rpmdir="$1"
+fi
+
+if [ "$use_rpmbuilddir" ]; then
+    RPMDIRS="$HOME/rpmbuild/RPMS/noarch $HOME/rpmbuild/RPMS/x86_64"
+    SRPMDIR="$HOME/rpmbuild/SRPMS"
+    REPO_OUTPUT_DIR="$HOME/rpmbuild/REPOPKG"
+fi
+if [ "$opt_rpmdir" ]; then
+    if [ ! -d "$opt_rpmdir" ]; then
+	echo "rpm directory \"$opt_rpmdir\" not found" >&2
+	usage
+	exit 1
+    fi
+    RPMDIRS="$opt_rpmdir"
+    SRPMDIR="$opt_rpmdir"
+    if [ "$use_rpmbuilddir" ]; then
+	echo "WARN: both -R option and [rpm_dir] parameter has specified: continue with overriding by [rpm_dir]"
+    fi
+fi
+if [ -z "$RPMDIRS" ]; then
+    echo "Neither rpm directory or -R options specified" >&2
+    usage
     exit 1
 fi
 
-buildsrc=true
-if [ "$1" = "--nosrc" ]; then
-    buildsrc=false
-    shift
-fi
+# to make sure which directories will be used
+echo "Packaging options"
+echo " RPMDIRS = $RPMDIRS"
+echo " SRPMDIR = $SRPMDIR"
+echo " REPO_OUTPUT_DIR = $REPO_OUTPUT_DIR"
+echo " RELSPEC = $RELSPEC"
 
 ### validate ###
 # if dist was not specified then use the system default
@@ -365,8 +438,12 @@ if [ ! -n "$rpm_ver" ] || [ ! -n "$rpm_release" ] || [ ! -n "$dist" ] ; then
 fi
 
 ### read configuration ###
-source $CONF_FILE
+if [ ! -f $CONF_FILE ]; then
+    echo "$CONF_FILE not found" >&2
+    exit 1
+fi
 
+source $CONF_FILE
 
 if [ ! -n "$BIN_FILES" ] || [ ! -n "$DEBUG_FILES" ] || [ ! -n "$SRC_FILES" ] ; then
     echo "Conf file is invalid." >&2
@@ -382,20 +459,21 @@ for i in "rpmbuild createrepo"; do
     fi
 done
 
-if [ ! -n "$1" ] || [ ! -d "$1" ]; then
-    echo "rpm directory \"$1\" not found" >&2
-    exit 1
+# create and move to the build working directory if specified
+if [ -n "$REPO_OUTPUT_DIR" ]; then
+    mkdir -p $REPO_OUTPUT_DIR
+    cd $REPO_OUTPUT_DIR
 fi
 
-# gloval params
+# global params
 SET_SPEC_FILE="pacemaker-all.spec"
 REPO_SPEC_FILE="pacemaker-repo.spec"
 YUM_CONF_FILE="pacemaker.repo"
-RPMDIR=`echo $1 | sed 's#/\$##g'`
 REPO_DIR="pacemaker-repo-${rpm_ver}-${rpm_release}.${dist}.x86_64"
 REPO_SRC_DIR="pacemaker-src-${rpm_ver}-${rpm_release}.${dist}.x86_64"
 REPO_DEBUG_DIR="pacemaker-debuginfo-${rpm_ver}-${rpm_release}.${dist}.x86_64"
 COMPRESS_DIR=""
+
 
 
 make_pacemaker_repo
