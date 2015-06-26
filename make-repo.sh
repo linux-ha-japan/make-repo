@@ -281,9 +281,9 @@ make_pacemaker_repo() {
     make_yum_repository
 
     ### build pacemaker-repo ###
-    rm -f /root/rpmbuild/SOURCES/${REPO_DIR}.tar.gz
+    rm -f $HOME/rpmbuild/SOURCES/${REPO_DIR}.tar.gz
     echo "Compressing ... ${REPO_DIR}.tar.gz"
-    tar zcf /root/rpmbuild/SOURCES/${REPO_DIR}.tar.gz $REPO_DIR
+    tar zcf $HOME/rpmbuild/SOURCES/${REPO_DIR}.tar.gz $REPO_DIR
 
     rpmfile=""
     echo "building pacemaker-repo .... see pacemaker-repo_build.log"
@@ -346,7 +346,7 @@ compress_dir() {
 
 
 usage() {
-    echo "$0: [-r|--release RELSPEC] [-R|--rpmbuilddir] [rpm_dir]"
+    echo "$0: [-r|--release RELSPEC] [-R|--rpmbuilddir] [--nosrc] [rpm_dir]"
     echo "  -r|--release RELSPEC: repository package version"
     echo "      format: RELSPEC=\${rpm_ver}-\${rpm_release}"
     echo "  -R|--rpmbuilddir: build under $HOME/rpmbuild directory for packaging"
@@ -358,7 +358,7 @@ usage() {
     echo "  --nosrc: skip building source packages for development"
     echo
     echo "Example 1: $0 -r \"1.1.13-1.1\" -R"
-    echo "Example 2: rpm_ver=\"1.1.10\" rpm_release=\"1.1\" dist=\"el6\" $0 [rpm_dir]"
+    echo "Example 2: rpm_ver=\"1.1.10\" rpm_release=\"1.1\" $0 [rpm_dir]"
 }
 
 ### main ######################################################################
@@ -367,7 +367,7 @@ usage() {
 RPMDIRS=""
 SRPMDIR=""
 REPO_OUTPUT_DIR=""
-RELSPEC=""
+opt_repspec=""
 opt_rpmdir=""
 use_rpmbuiddir=false
 buildsrc=true
@@ -381,7 +381,7 @@ eval set -- "$OPT"
 
 while true; do
   case "$1" in
-      -r|--release) RELSPEC="$2"; echo "WARN: Not implemented yet: -r|--release" 1>&2; shift; shift;;
+      -r|--release) opt_relspec="$2"; shift; shift;;
       -R|--rpmbuilddir) use_rpmbuilddir=true; shift;;
       --nosrc) buildsrc=false; shift;;
       --help) usage; exit 0;;
@@ -416,14 +416,16 @@ if [ -z "$RPMDIRS" ]; then
     exit 1
 fi
 
-# to make sure which directories will be used
-echo "Packaging options"
-echo " RPMDIRS = $RPMDIRS"
-echo " SRPMDIR = $SRPMDIR"
-echo " REPO_OUTPUT_DIR = $REPO_OUTPUT_DIR"
-echo " RELSPEC = $RELSPEC"
-
 ### validate ###
+# command check
+for i in "rpmbuild createrepo"; do
+    which $i > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        echo "$i not found" >&2
+        exit 1
+    fi
+done
+
 # if dist was not specified then use the system default
 #  $dist is without a period character in this script.
 if [ -z "$dist" ]; then
@@ -431,11 +433,25 @@ if [ -z "$dist" ]; then
  echo "Use dist='$dist'"
 fi
 
+if [ -n "$opt_relspec" ]; then
+    rpm_ver=`expr $opt_relspec : '^\([^-]*\)-[^-]*$'`
+    rpm_release=`expr $opt_relspec : '^[^-]*-\([^-]*\)$'`
+fi
+
 if [ ! -n "$rpm_ver" ] || [ ! -n "$rpm_release" ] || [ ! -n "$dist" ] ; then
-    echo "Please specify rpm_ver and rpm_release and dist." >&2
-    echo "Example: rpm_ver=\"1.1.10\" rpm_release=\"1.1\" dist=\"el6\" $0 [rpm_dir]"
+    echo "Please specify rpm_ver and rpm_release or -r option properly" >&2
+    usage
     exit 1
 fi
+
+# to make sure which directories will be used
+echo "Packaging options"
+echo " RPMDIRS = $RPMDIRS"
+echo " SRPMDIR = $SRPMDIR"
+echo " REPO_OUTPUT_DIR = $REPO_OUTPUT_DIR"
+echo " rpm_ver = $rpm_ver"
+echo " rpm_release = $rpm_release"
+echo " dist = $dist"
 
 ### read configuration ###
 if [ ! -f $CONF_FILE ]; then
@@ -449,15 +465,6 @@ if [ ! -n "$BIN_FILES" ] || [ ! -n "$DEBUG_FILES" ] || [ ! -n "$SRC_FILES" ] ; t
     echo "Conf file is invalid." >&2
     exit 1
 fi
-
-# command check
-for i in "rpmbuild createrepo"; do
-    which $i > /dev/null 2>&1
-    if [ $? -ne 0 ]; then
-        echo "$i not found" >&2
-        exit 1
-    fi
-done
 
 # create and move to the build working directory if specified
 if [ -n "$REPO_OUTPUT_DIR" ]; then
@@ -494,5 +501,10 @@ echo " BIN_FILES   : $num_bin"
 echo " DEBUG_FILES : $num_debug"
 echo " SRC_FILES   : $num_src"
 
+if [ -n "$REPO_OUTPUT_DIR" ]; then
+   echo
+   echo "The repository package was generated under $REPO_OUTPUT_DIR"
+fi
 
+echo
 echo "done"
