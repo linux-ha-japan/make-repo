@@ -126,6 +126,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 %define rpm_dir       %{pm_dir}/rpm
 %define repodata_dir  %{pm_dir}/repodata
 %define repo_dir      %{_sysconfdir}/yum.repos.d
+%define debug_package %{nil}
 
 %description
 Install Pacemaker repository.
@@ -346,7 +347,7 @@ compress_dir() {
 
 
 usage() {
-    echo "$0: [-r|--release RELSPEC] [-R|--rpmbuilddir] [--nosrc] [rpm_dir]"
+    echo "$0: [-r|--release RELSPEC] [-R|--rpmbuilddir] [-C|--clean] [--nosrc] [rpm_dir]"
     echo "  -r|--release RELSPEC: repository package version"
     echo "      format: RELSPEC=\${rpm_ver}-\${rpm_release}"
     echo "  -R|--rpmbuilddir: build under $HOME/rpmbuild directory for packaging"
@@ -355,6 +356,7 @@ usage() {
     echo "         $HOME/rpmbuild/RPMS   : binary rpms to be packaged"
     echo "                                 (x86_64 and noarch only; no i386 support yet)"
     echo "         $HOME/rpmbuild/SRPMS  : source rpms to be packaged"
+    echo "  -C|--clean: clean up working directory after packaged"
     echo "  --nosrc: skip building source packages for development"
     echo
     echo "Example 1: $0 -r \"1.1.13-1.1\" -R"
@@ -370,10 +372,11 @@ REPO_OUTPUT_DIR=""
 opt_repspec=""
 opt_rpmdir=""
 use_rpmbuiddir=false
+do_cleanup=false
 buildsrc=true
 
 ### parse options ###
-OPT=`getopt -o r:R --long release:,rpmbuilddir,nosrc,help -- "$@"`
+OPT=`getopt -o r:RC --long release:,rpmbuilddir,clean,nosrc,help -- "$@"`
 if [ $? != 0 ] ; then
   exit 1
 fi
@@ -383,6 +386,7 @@ while true; do
   case "$1" in
       -r|--release) opt_relspec="$2"; shift; shift;;
       -R|--rpmbuilddir) use_rpmbuilddir=true; shift;;
+      -C|--clean) do_cleanup=true; shift;;
       --nosrc) buildsrc=false; shift;;
       --help) usage; exit 0;;
       --) shift; break;;
@@ -487,6 +491,12 @@ make_pacemaker_repo
 make_pacemaker_debuginfo_repo
 $buildsrc && make_pacemaker_src_repo
 compress_dir
+
+if [ "$do_cleanup" ]; then
+    rm -rf $REPO_DIR
+    rm -rf $REPO_DEBUG_DIR
+    rm -rf $REPO_SRC_DIR
+fi
 
 # print total number of packages
 set -- $BIN_FILES
