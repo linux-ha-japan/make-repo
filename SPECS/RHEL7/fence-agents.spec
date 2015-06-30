@@ -15,24 +15,12 @@
 
 Name: fence-agents
 Summary: Fence Agents for Red Hat Cluster
-Version: 4.0.11
-Release: 8%{?alphatag:.%{alphatag}}%{?dist}
+Version: 4.0.18
+Release: 1%{?alphatag:.%{alphatag}}%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
 URL: http://sourceware.org/cluster/wiki/
-Source0: https://fedorahosted.org/releases/f/e/fence-agents/%{name}-%{version}.tar.xz
-Patch0: bz1072564-1-add_ssl_secure_and_ssl_insecure.patch
-Patch1: bz1072564-2-add_ssl_secure_and_ssl_insecure.patch
-Patch2: backward-rename_fence_scsi_check_to_pl.patch
-Patch3: bz1121122-1-fence_ilo_ssh.patch
-Patch4: bz1140921-1-fence_zvm.patch
-Patch5: bz1111597-1-fence_rsb.patch
-Patch6: bz1148762-1-fence_wti_eol.patch
-Patch7: bz1153059-1-fence_vmware_soap-fail_usage.patch
-Patch8: bz1111599-1-fence_cisco_and_soap_logout.patch
-Patch9: bz1162092-1-fix_ssl_secure.patch
-Patch10: bz1140921-2-fence_zvm.patch
-Patch11: bz1140921-3-fence_zvm.patch
+Source0: fence-agents/%{name}-%{version}.tar.xz
 
 %if 0%{?rhel}
 %global supportedagents apc apc_snmp bladecenter brocade cisco_mds cisco_ucs drac5 eaton_snmp eps hpblade ibmblade ifmib ilo ilo_mp ilo_ssh intelmodular ipdu ipmilan kdump rhevm rsb scsi vmware_soap wti
@@ -58,18 +46,6 @@ BuildRequires: autoconf automake libtool
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch0 -p1 -b .bz1072564-1
-%patch1 -p1 -b .bz1072564-2
-%patch2 -p1 -b .backward-fence_scsi_check_rename
-%patch3 -p1 -b .bz1121122-1
-%patch4 -p1 -b .bz1140921-1
-%patch5 -p1 -b .bz1111597-1
-%patch6 -p1 -b .bz1148762-1
-%patch7 -p1 -b .bz1153059-1
-%patch8 -p1 -b .bz1111599-1
-%patch9 -p1 -b .bz1162092-1
-%patch10 -p1 -b .bz1140921-2
-%patch11 -p1 -b .bz1140921-3
 
 %build
 ./autogen.sh
