@@ -140,7 +140,9 @@ The fence-agents-apc-snmp package contains a fence agent for APC devices that ar
 %files apc-snmp
 %defattr(-,root,root,-)
 %{_sbindir}/fence_apc_snmp
+%{_sbindir}/fence_tripplite_snmp
 %{_mandir}/man8/fence_apc_snmp.8*
+%{_mandir}/man8/fence_tripplite_snmp.8*
 
 %package bladecenter
 License: GPLv2+ and LGPLv2+
