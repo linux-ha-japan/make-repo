@@ -323,7 +323,11 @@ The fence-agents-ilo-ssh package contains a fence agent for HP iLO devices that 
 %files ilo-ssh
 %defattr(-,root,root,-)
 %{_sbindir}/fence_ilo_ssh
+%{_sbindir}/fence_ilo3_ssh
+%{_sbindir}/fence_ilo4_ssh
 %{_mandir}/man8/fence_ilo_ssh.8*
+%{_mandir}/man8/fence_ilo3_ssh.8*
+%{_mandir}/man8/fence_ilo4_ssh.8*
 
 %package intelmodular
 License: GPLv2+ and LGPLv2+
