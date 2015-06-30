@@ -492,7 +492,7 @@ The fence-agents-scsi package contains fence agent for SCSI persisent reservatio
 %files scsi
 %defattr(-,root,root,-)
 %{_sbindir}/fence_scsi
-%{_datadir}/cluster/fence_scsi_check.pl
+%{_datadir}/cluster/fence_scsi_check
 %{_mandir}/man8/fence_scsi.8*
 
 %package virsh
