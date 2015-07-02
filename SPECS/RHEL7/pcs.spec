@@ -15,8 +15,8 @@
 %endif
 
 Name: pcs		
-Version: 0.9.137
-Release: 13%{?dist}
+Version: 0.9.141
+Release: 1%{?dist}
 License: GPLv2
 URL: http://github.com/feist/pcs
 Group: System Environment/Base
@@ -25,20 +25,6 @@ BuildRequires: python2-devel
 Summary: Pacemaker Configuration System	
 Source0: http://people.redhat.com/cfeist/pcs/pcs-withgems-%{version}.tar.gz
 Source1: HAM-logo.png
-Patch0: bz1115537-Improve-error-messages-for-scoped-cib-operations.patch
-Patch1: bz1156311-Fix-waiting-for-resource-operations.patch
-Patch2: bz1170150-Fix-displaying-globally-unique-clones-in-GUI.patch
-Patch3: bz1054491-Fix-acl-add-duplicate-names-and-remove-roles-in-GUI.patch
-Patch4: bz1179023-Added-support-for-resource-discovery-on-location-con.patch
-Patch5: bz1054491-Delete-a-user-group-when-deleting-its-last-role-in-GUI.patch
-Patch6: bz1179023-Added-support-for-resource-discovery-on-location-con-2.patch
-Patch7: bz1054491-Add-acl-enable-and-disable-commands-3.patch
-Patch8: bz1180390-Stop-deleted-resource-before-removing-its-constraint.patch
-Patch9: bz1180506-stop-cluster-nodes-in-parallel.patch
-Patch10: bz1180506-Warn-if-nodes-stop-will-cause-a-loss-of-the-quorum.patch
-Patch11: bz1180506-3-Keep-cluster-quorate-during-destruction-as-long-as-possible.patch
-
-# NOTE: Source20 and Patch200+ belong to python-clufter
 
 BuildRequires: ruby >= 2.0.0 ruby-devel rubygems pam-devel git
 BuildRequires: systemd-units rubygem-bundler
