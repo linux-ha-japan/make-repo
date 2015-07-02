@@ -1,4 +1,4 @@
-%bcond_without clufter
+%bcond_with clufter
 %if %{with clufter}
 %{!?clufter_name:    %global clufter_name     clufter}
 %{!?clufter_pkg_name:%global clufter_pkg_name python-clufter}
@@ -23,8 +23,7 @@ Group: System Environment/Base
 #BuildArch: x86_64
 BuildRequires: python2-devel
 Summary: Pacemaker Configuration System	
-Source0: http://people.redhat.com/cfeist/pcs/pcs-withgems-%{version}.tar.gz
-Source1: HAM-logo.png
+Source0: pcs-%{version}.tar.gz
 
 BuildRequires: ruby >= 2.0.0 ruby-devel rubygems pam-devel git
 BuildRequires: systemd-units rubygem-bundler
@@ -80,7 +79,6 @@ ln -s "%{clufter_source}" "%{clufter_name}"
 
 # ditto as previous comment
 %endif
-cp -f %SOURCE1 pcsd/public/images
 
 %if %{with clufter}
 pushd "%{clufter_name}" >/dev/null
@@ -110,6 +108,7 @@ popd >/dev/null
 %install
 rm -rf $RPM_BUILD_ROOT
 pwd
+export BUILD_GEMS=false
 make install DESTDIR=$RPM_BUILD_ROOT PYTHON_SITELIB=%{python_sitelib}
 make install_pcsd DESTDIR=$RPM_BUILD_ROOT PYTHON_SITELIB=%{python_sitelib} hdrdir="%{_includedir}" rubyhdrdir="%{_includedir}" includedir="%{_includedir}"
 chmod 755 $RPM_BUILD_ROOT/%{python_sitelib}/pcs/pcs.py
@@ -186,8 +185,6 @@ popd >/dev/null
 %{python_sitelib}/pcs-%{version}-py2.*.egg-info
 /usr/sbin/pcs
 /usr/lib/pcsd/*
-/usr/lib/pcsd/.bundle/config
-/usr/lib/pcsd/.gitignore
 /usr/lib/systemd/system/pcsd.service
 /var/lib/pcsd
 /etc/pam.d/pcsd
