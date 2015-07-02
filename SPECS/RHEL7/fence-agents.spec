@@ -15,7 +15,7 @@
 
 Name: fence-agents
 Summary: Fence Agents for Red Hat Cluster
-Version: 4.0.18
+Version: 4.0.19
 Release: 1%{?alphatag:.%{alphatag}}%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
@@ -23,8 +23,8 @@ URL: http://sourceware.org/cluster/wiki/
 Source0: fence-agents/%{name}-%{version}.tar.xz
 
 %if 0%{?rhel}
-%global supportedagents apc apc_snmp bladecenter brocade cisco_mds cisco_ucs drac5 eaton_snmp eps hpblade ibmblade ifmib ilo ilo_mp ilo_ssh intelmodular ipdu ipmilan kdump rhevm rsb scsi vmware_soap wti
-%global allfenceagents fence-agents-apc fence-agents-apc-snmp fence-agents-bladecenter fence-agents-brocade fence-agents-cisco-mds fence-agents-cisco-ucs fence-agents-drac5 fence-agents-eaton-snmp fence-agents-eps fence-agents-hpblade fence-agents-ibmblade fence-agents-ifmib fence-agents-ilo2 fence-agents-ilo-mp fence-agents-ilo-ssh fence-agents-intelmodular fence-agents-ipdu fence-agents-ipmilan fence-agents-kdump fence-agents-rhevm fence-agents-rsb fence-agents-scsi fence-agents-vmware-soap fence-agents-wti
+%global supportedagents apc apc_snmp bladecenter brocade cisco_mds cisco_ucs compute drac5 eaton_snmp eps hpblade ibmblade ifmib ilo ilo_mp ilo_ssh intelmodular ipdu ipmilan kdump rhevm rsb scsi vmware_soap wti
+%global allfenceagents fence-agents-apc fence-agents-apc-snmp fence-agents-bladecenter fence-agents-brocade fence-agents-cisco-mds fence-agents-cisco-ucs fence-agents-compute fence-agents-drac5 fence-agents-eaton-snmp fence-agents-eps fence-agents-hpblade fence-agents-ibmblade fence-agents-ifmib fence-agents-ilo2 fence-agents-ilo-mp fence-agents-ilo-ssh fence-agents-intelmodular fence-agents-ipdu fence-agents-ipmilan fence-agents-kdump fence-agents-rhevm fence-agents-rsb fence-agents-scsi fence-agents-vmware-soap fence-agents-wti
 %ifarch s390x
 %global testagents virsh zvm
 %else
@@ -199,6 +199,20 @@ The fence-agents-cisco-ucs package contains a fence agent for Cisco UCS series d
 %defattr(-,root,root,-)
 %{_sbindir}/fence_cisco_ucs
 %{_mandir}/man8/fence_cisco_ucs.8*
+
+%package compute
+License: GPLv2+ and LGPLv2+
+Group: System Environment/Base
+Summary: Fence agent for Nova compute nodes
+Requires: fence-agents-common >= %{version}-%{release}
+Requires: python-requests
+Obsoletes: fence-agents
+%description compute
+The fence-agents-compute package contains a fence agent for Nova compute nodes.
+%files compute
+%defattr(-,root,root,-)
+%{_sbindir}/fence_compute
+%{_mandir}/man8/fence_compute.8*
 
 %package drac5
 License: GPLv2+ and LGPLv2+
