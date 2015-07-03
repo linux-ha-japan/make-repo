@@ -208,7 +208,8 @@ END
 
 # arg1 : dir
 check_dir() {
-    if [ -d "$1" ]; then
+    # always delete existing directory when the cleanup option was specified
+    if [ -d "$1" ] && ! $do_cleanup ; then
         YN="E"
         echo "$1 dir exists."
         echo "Delete?(d) Skip?(s) Exit?(E) d/s/E"
@@ -228,6 +229,7 @@ check_dir() {
                 ;;
         esac
     fi
+    rm -rf "$1"
     rm -f $1.tar.gz
 }
 
@@ -239,25 +241,6 @@ mkdir_and_cp_pacemaker_repo() {
     rc=$?
     if [ $rc -ne 0 ]; then
         return $rc
-    fi
-
-    if [ -d "$REPO_DIR" ]; then
-        YN="N"
-        echo "$REPO_DIR dir exists. Delete?(d) Skip?(s) d/s/N"
-        read YN
-
-        case "$YN" in
-            d)   
-                rm -rf $REPO_DIR
-                ;;
-            s)   
-                return 2
-                ;;
-            *)   
-                echo "Please delete $REPO_DIR dir"
-                exit 1
-                ;;
-        esac
     fi
 
     ### make main repository dir ###
@@ -356,7 +339,7 @@ usage() {
     echo "         $HOME/rpmbuild/RPMS   : binary rpms to be packaged"
     echo "                                 (x86_64 and noarch only; no i386 support yet)"
     echo "         $HOME/rpmbuild/SRPMS  : source rpms to be packaged"
-    echo "  -C|--clean: clean up working directory after packaged"
+    echo "  -C|--clean: always clean up working directory when packaging"
     echo "  --nosrc: skip building source packages for development"
     echo
     echo "Example 1: $0 -r \"1.1.13-1.1\" -R"
