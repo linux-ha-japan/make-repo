@@ -70,10 +70,10 @@ make_pacemaker_set_sepc() {
 Name: pacemaker-all
 Version: ${rpm_ver}
 Release: ${rpm_release}%{?dist}
-Summary: pacemaker set
+Summary: pacemaker and recommended toolset
 Group: Environment/Daemons
 License: GPL
-URL: http://sourceforge.jp/projects/linux-ha/
+URL: http://osdn.jp/projects/linux-ha/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
 
@@ -98,7 +98,7 @@ END
     cat >> $SET_SPEC_FILE <<END
 
 %description
-This package collects required packages as Pacemaker-set.
+This package collects required packages as pacemaker-all.
 
 %files
 
@@ -117,7 +117,7 @@ Release: ${rpm_release}%{?dist}
 Summary: Packages for High-Availability Linux
 Group: System Environment/Base
 License: GPL
-URL: http://sourceforge.jp/projects/linux-ha/
+URL: http://osdn.jp/projects/linux-ha/
 Source0: %{name}-%{version}-%{release}.%{_arch}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -161,9 +161,8 @@ cp -p $YUM_CONF_FILE \${RPM_BUILD_ROOT}%{repo_dir}
 rm -rf \${RPM_BUILD_ROOT}
 
 %changelog
-* Fri Jul 12 2013 Takatoshi MATSUO
-- Initial version
 END
+    echo -e "$changelog" >> $REPO_SPEC_FILE
 }
 
 make_pacemaker_set() {
