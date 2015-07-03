@@ -70,10 +70,10 @@ make_pacemaker_set_sepc() {
 Name: pacemaker-all
 Version: ${rpm_ver}
 Release: ${rpm_release}%{?dist}
-Summary: pacemaker set
+Summary: pacemaker and recommended toolset
 Group: Environment/Daemons
 License: GPL
-URL: http://sourceforge.jp/projects/linux-ha/
+URL: http://osdn.jp/projects/linux-ha/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
 
@@ -98,7 +98,7 @@ END
     cat >> $SET_SPEC_FILE <<END
 
 %description
-This package collects required packages as Pacemaker-set.
+This package collects required packages as pacemaker-all.
 
 %files
 
@@ -117,7 +117,7 @@ Release: ${rpm_release}%{?dist}
 Summary: Packages for High-Availability Linux
 Group: System Environment/Base
 License: GPL
-URL: http://sourceforge.jp/projects/linux-ha/
+URL: http://osdn.jp/projects/linux-ha/
 Source0: %{name}-%{version}-%{release}.%{_arch}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -161,9 +161,8 @@ cp -p $YUM_CONF_FILE \${RPM_BUILD_ROOT}%{repo_dir}
 rm -rf \${RPM_BUILD_ROOT}
 
 %changelog
-* Fri Jul 12 2013 Takatoshi MATSUO
-- Initial version
 END
+    echo -e "$changelog" >> $REPO_SPEC_FILE
 }
 
 make_pacemaker_set() {
@@ -208,7 +207,8 @@ END
 
 # arg1 : dir
 check_dir() {
-    if [ -d "$1" ]; then
+    # always delete existing directory when the cleanup option was specified
+    if [ -d "$1" ] && ! $do_cleanup ; then
         YN="E"
         echo "$1 dir exists."
         echo "Delete?(d) Skip?(s) Exit?(E) d/s/E"
@@ -228,6 +228,7 @@ check_dir() {
                 ;;
         esac
     fi
+    rm -rf "$1"
     rm -f $1.tar.gz
 }
 
@@ -239,25 +240,6 @@ mkdir_and_cp_pacemaker_repo() {
     rc=$?
     if [ $rc -ne 0 ]; then
         return $rc
-    fi
-
-    if [ -d "$REPO_DIR" ]; then
-        YN="N"
-        echo "$REPO_DIR dir exists. Delete?(d) Skip?(s) d/s/N"
-        read YN
-
-        case "$YN" in
-            d)   
-                rm -rf $REPO_DIR
-                ;;
-            s)   
-                return 2
-                ;;
-            *)   
-                echo "Please delete $REPO_DIR dir"
-                exit 1
-                ;;
-        esac
     fi
 
     ### make main repository dir ###
@@ -356,7 +338,7 @@ usage() {
     echo "         $HOME/rpmbuild/RPMS   : binary rpms to be packaged"
     echo "                                 (x86_64 and noarch only; no i386 support yet)"
     echo "         $HOME/rpmbuild/SRPMS  : source rpms to be packaged"
-    echo "  -C|--clean: clean up working directory after packaged"
+    echo "  -C|--clean: always clean up working directory when packaging"
     echo "  --nosrc: skip building source packages for development"
     echo
     echo "Example 1: $0 -r \"1.1.13-1.1\" -R"
@@ -371,7 +353,7 @@ SRPMDIR=""
 REPO_OUTPUT_DIR=""
 opt_repspec=""
 opt_rpmdir=""
-use_rpmbuiddir=false
+use_rpmbuilddir=false
 do_cleanup=false
 buildsrc=true
 
@@ -397,7 +379,7 @@ if [ -n "$1" ]; then
     opt_rpmdir="$1"
 fi
 
-if [ "$use_rpmbuilddir" ]; then
+if $use_rpmbuilddir; then
     RPMDIRS="$HOME/rpmbuild/RPMS/noarch $HOME/rpmbuild/RPMS/x86_64"
     SRPMDIR="$HOME/rpmbuild/SRPMS"
     REPO_OUTPUT_DIR="$HOME/rpmbuild/REPOPKG"
@@ -410,7 +392,7 @@ if [ "$opt_rpmdir" ]; then
     fi
     RPMDIRS="$opt_rpmdir"
     SRPMDIR="$opt_rpmdir"
-    if [ "$use_rpmbuilddir" ]; then
+    if $use_rpmbuilddir; then
 	echo "WARN: both -R option and [rpm_dir] parameter has specified: continue with overriding by [rpm_dir]"
     fi
 fi
@@ -492,7 +474,7 @@ make_pacemaker_debuginfo_repo
 $buildsrc && make_pacemaker_src_repo
 compress_dir
 
-if [ "$do_cleanup" ]; then
+if $do_cleanup; then
     rm -rf $REPO_DIR
     rm -rf $REPO_DEBUG_DIR
     rm -rf $REPO_SRC_DIR
