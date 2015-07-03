@@ -371,7 +371,7 @@ SRPMDIR=""
 REPO_OUTPUT_DIR=""
 opt_repspec=""
 opt_rpmdir=""
-use_rpmbuiddir=false
+use_rpmbuilddir=false
 do_cleanup=false
 buildsrc=true
 
@@ -397,7 +397,7 @@ if [ -n "$1" ]; then
     opt_rpmdir="$1"
 fi
 
-if [ "$use_rpmbuilddir" ]; then
+if $use_rpmbuilddir; then
     RPMDIRS="$HOME/rpmbuild/RPMS/noarch $HOME/rpmbuild/RPMS/x86_64"
     SRPMDIR="$HOME/rpmbuild/SRPMS"
     REPO_OUTPUT_DIR="$HOME/rpmbuild/REPOPKG"
@@ -410,7 +410,7 @@ if [ "$opt_rpmdir" ]; then
     fi
     RPMDIRS="$opt_rpmdir"
     SRPMDIR="$opt_rpmdir"
-    if [ "$use_rpmbuilddir" ]; then
+    if $use_rpmbuilddir; then
 	echo "WARN: both -R option and [rpm_dir] parameter has specified: continue with overriding by [rpm_dir]"
     fi
 fi
@@ -492,7 +492,7 @@ make_pacemaker_debuginfo_repo
 $buildsrc && make_pacemaker_src_repo
 compress_dir
 
-if [ "$do_cleanup" ]; then
+if $do_cleanup; then
     rm -rf $REPO_DIR
     rm -rf $REPO_DEBUG_DIR
     rm -rf $REPO_SRC_DIR
