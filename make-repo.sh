@@ -281,50 +281,241 @@ make_pacemaker_repo() {
     mv $rpmfile .
 }
 
+### make pacemaker-debuginfo-repo.spec file ###
+make_pacemaker_debuginfo_repo_spec() {
+    cat > $REPO_DEBUG_SPEC_FILE << END
+Name: pacemaker-repo-debuginfo
+Version: ${rpm_ver}
+Release: ${rpm_release}%{?dist}
+Summary: Debuginfo Packages for High-Availability Linux
+Group: System Environment/Base
+License: GPL
+URL: http://osdn.jp/projects/linux-ha/
+Source0: %{name}-%{version}-%{release}.%{_arch}.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+
+%define linux_ha_dir  /opt/linux-ha
+%define pm_dir        %{linux_ha_dir}/pacemaker-debuginfo
+%define rpm_dir       %{pm_dir}/rpm
+%define repodata_dir  %{pm_dir}/repodata
+%define repo_dir      %{_sysconfdir}/yum.repos.d
+%define debug_package %{nil}
+
+%description
+Install Pacemaker repository.
+
+%prep
+
+%setup -q -n %{name}-%{version}-%{release}.%{_arch}
+
+%build
+
+%install
+rm -rf \${RPM_BUILD_ROOT}
+
+mkdir -p \${RPM_BUILD_ROOT}%{rpm_dir}
+cp -pr rpm/* \${RPM_BUILD_ROOT}%{rpm_dir}
+
+mkdir -p \${RPM_BUILD_ROOT}%{repodata_dir}
+cp -pr repodata/* \${RPM_BUILD_ROOT}%{repodata_dir}
+
+mkdir -p \${RPM_BUILD_ROOT}%{repo_dir}
+cp -p $YUM_DEBUG_CONF_FILE \${RPM_BUILD_ROOT}%{repo_dir}
+
+%files
+%defattr(-,root,root)
+%dir %{linux_ha_dir}
+%dir %{pm_dir}
+%{rpm_dir}
+%{repodata_dir}
+%config(noreplace) %{repo_dir}/$YUM_DEBUG_CONF_FILE
+
+%clean
+rm -rf \${RPM_BUILD_ROOT}
+
+%changelog
+END
+    echo -e "$changelog" >> $REPO_DEBUG_SPEC_FILE
+}
+
+### pacemaker-debuginfo.repo file ###
+make_yum_repository_debuginfo() {
+    cat >> $REPO_DEBUG_DIR/$YUM_DEBUG_CONF_FILE << END
+[linux-ha-ja-pacemaker-debuginfo]
+name=linux-ha-ja-pacemaker-debuginfo
+baseurl=file:///opt/linux-ha/pacemaker-debuginfo/
+enabled=1
+gpgcheck=0
+END
+
+    echo "Creating debuginfo yum repository ..."
+    createrepo $REPO_DEBUG_DIR
+    if [ $? -ne 0 ]; then
+        echo "createrepo failed" >&2
+        exit 1
+    fi
+}
+
 ### make pacemaker-debuginfo-repo ###
-make_pacemaker_debuginfo_repo() {
+mkdir_and_cp_pacemaker_debuginfo_repo() {
     local filename
 
     check_dir "$REPO_DEBUG_DIR" || return $?
 
-    mkdir $REPO_DEBUG_DIR
+    mkdir -p $REPO_DEBUG_DIR/rpm
     for i in $DEBUG_FILES; do
         filename=`get_filename_rpm $i`
 	if [ $? -ne 0 ]; then exit 1; fi
         echo "copy $filename"
-        cp $filename $REPO_DEBUG_DIR
+        cp $filename $REPO_DEBUG_DIR/rpm/
     done
-    COMPRESS_DIR="$COMPRESS_DIR $REPO_DEBUG_DIR"
+    chown root:root -R $REPO_DEBUG_DIR
+    chmod 644 $REPO_DEBUG_DIR/rpm/*
+}
+
+make_pacemaker_debuginfo_repo() {
+    local rpmfile
+
+    mkdir_and_cp_pacemaker_debuginfo_repo || return $?
+
+    make_pacemaker_debuginfo_repo_spec
+    make_yum_repository_debuginfo
+
+    ### build pacemaker-repo ###
+    rm -f $HOME/rpmbuild/SOURCES/${REPO_DEBUG_DIR}.tar.gz
+    echo "Compressing ... ${REPO_DEBUG_DIR}.tar.gz"
+    tar zcf $HOME/rpmbuild/SOURCES/${REPO_DEBUG_DIR}.tar.gz $REPO_DEBUG_DIR
+
+    rpmfile=""
+    echo "building pacemaker-repo-debuginfo .... see pacemaker-repo_build.log"
+    rpmfile=`LANG=C rpmbuild -bb $REPO_DEBUG_SPEC_FILE 2>> pacemaker-repo_build.log | grep "Wrote:" | cut -d ":" -f 2`
+    if [ ! -n "$rpmfile" ]; then
+        echo "rpmbuild failed"
+        exit 1
+    fi
+
+    echo
+    echo "mv $rpmfile ."
+    mv $rpmfile .
+}
+
+### make pacemaker-src-repo.spec file ###
+make_pacemaker_src_repo_spec() {
+    cat > $REPO_SRC_SPEC_FILE << END
+Name: pacemaker-repo-src
+Version: ${rpm_ver}
+Release: ${rpm_release}%{?dist}
+Summary: Source Packages for High-Availability Linux
+Group: System Environment/Base
+License: GPL
+URL: http://osdn.jp/projects/linux-ha/
+Source0: %{name}-%{version}-%{release}.%{_arch}.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+
+%define linux_ha_dir  /opt/linux-ha
+%define pm_dir        %{linux_ha_dir}/pacemaker-src
+%define rpm_dir       %{pm_dir}/rpm
+%define repodata_dir  %{pm_dir}/repodata
+%define repo_dir      %{_sysconfdir}/yum.repos.d
+%define debug_package %{nil}
+
+%description
+Install Pacemaker repository.
+
+%prep
+
+%setup -q -n %{name}-%{version}-%{release}.%{_arch}
+
+%build
+
+%install
+rm -rf \${RPM_BUILD_ROOT}
+
+mkdir -p \${RPM_BUILD_ROOT}%{rpm_dir}
+cp -pr rpm/* \${RPM_BUILD_ROOT}%{rpm_dir}
+
+mkdir -p \${RPM_BUILD_ROOT}%{repodata_dir}
+cp -pr repodata/* \${RPM_BUILD_ROOT}%{repodata_dir}
+
+mkdir -p \${RPM_BUILD_ROOT}%{repo_dir}
+cp -p $YUM_SRC_CONF_FILE \${RPM_BUILD_ROOT}%{repo_dir}
+
+%files
+%defattr(-,root,root)
+%dir %{linux_ha_dir}
+%dir %{pm_dir}
+%{rpm_dir}
+%{repodata_dir}
+%config(noreplace) %{repo_dir}/$YUM_SRC_CONF_FILE
+
+%clean
+rm -rf \${RPM_BUILD_ROOT}
+
+%changelog
+END
+    echo -e "$changelog" >> $REPO_SRC_SPEC_FILE
+}
+
+### pacemaker-src.repo file ###
+make_yum_repository_src() {
+    cat >> $REPO_SRC_DIR/$YUM_SRC_CONF_FILE << END
+[linux-ha-ja-pacemaker-src]
+name=linux-ha-ja-pacemaker-src
+baseurl=file:///opt/linux-ha/pacemaker-src/
+enabled=1
+gpgcheck=0
+END
+
+    echo "Creating src yum repository ..."
+    createrepo $REPO_SRC_DIR
+    if [ $? -ne 0 ]; then
+        echo "createrepo failed" >&2
+        exit 1
+    fi
 }
 
 ### make pacemaker-src-repo ###
-make_pacemaker_src_repo() {
+mkdir_and_cp_pacemaker_src_repo() {
     local filename
 
     check_dir "$REPO_SRC_DIR" || return $?
 
-    mkdir $REPO_SRC_DIR
+    mkdir -p $REPO_SRC_DIR/rpm
     for i in $SRC_FILES; do
         filename=`get_filename_srpm $i`
 	if [ $? -ne 0 ]; then exit 1; fi
         echo "copy $filename"
-        cp $filename $REPO_SRC_DIR
+        cp $filename $REPO_SRC_DIR/rpm/
     done
-    COMPRESS_DIR="$COMPRESS_DIR $REPO_SRC_DIR"
+    chown root:root -R $REPO_SRC_DIR
+    chmod 644 $REPO_SRC_DIR/rpm/*
 }
 
-### compress debuginfo-repo, src-repo ###
-compress_dir() {
-    if [ `echo "$COMPRESS_DIR" | wc -w` -eq 0 ]; then
-        return 0
+### make pacemaker-src-repo ###
+make_pacemaker_src_repo() {
+    local rpmfile
+
+    mkdir_and_cp_pacemaker_src_repo || return $?
+
+    make_pacemaker_src_repo_spec
+    make_yum_repository_src
+
+    ### build pacemaker-repo ###
+    rm -f $HOME/rpmbuild/SOURCES/${REPO_SRC_DIR}.tar.gz
+    echo "Compressing ... ${REPO_SRC_DIR}.tar.gz"
+    tar zcf $HOME/rpmbuild/SOURCES/${REPO_SRC_DIR}.tar.gz $REPO_SRC_DIR
+
+    rpmfile=""
+    echo "building pacemaker-repo-src .... see pacemaker-repo_build.log"
+    rpmfile=`LANG=C rpmbuild -bb $REPO_SRC_SPEC_FILE 2>> pacemaker-repo_build.log | grep "Wrote:" | cut -d ":" -f 2`
+    if [ ! -n "$rpmfile" ]; then
+        echo "rpmbuild failed"
+        exit 1
     fi
-    for i in $COMPRESS_DIR; do
-        chown -R root:root $i
-        chmod 644 $i/*
-        chmod 755 $i
-        echo "Compressing ... $i.tar.gz"
-        tar zcf $i.tar.gz $i
-    done
+
+    echo
+    echo "mv $rpmfile ."
+    mv $rpmfile .
 }
 
 
@@ -461,18 +652,20 @@ fi
 # global params
 SET_SPEC_FILE="pacemaker-all.spec"
 REPO_SPEC_FILE="pacemaker-repo.spec"
+REPO_SRC_SPEC_FILE="pacemaker-src-repo.spec"
+REPO_DEBUG_SPEC_FILE="pacemaker-debuginfo-repo.spec"
 YUM_CONF_FILE="pacemaker.repo"
+YUM_SRC_CONF_FILE="pacemaker-src.repo"
+YUM_DEBUG_CONF_FILE="pacemaker-debuginfo.repo"
 REPO_DIR="pacemaker-repo-${rpm_ver}-${rpm_release}.${dist}.x86_64"
-REPO_SRC_DIR="pacemaker-src-${rpm_ver}-${rpm_release}.${dist}.x86_64"
-REPO_DEBUG_DIR="pacemaker-debuginfo-${rpm_ver}-${rpm_release}.${dist}.x86_64"
-COMPRESS_DIR=""
+REPO_SRC_DIR="pacemaker-repo-src-${rpm_ver}-${rpm_release}.${dist}.x86_64"
+REPO_DEBUG_DIR="pacemaker-repo-debuginfo-${rpm_ver}-${rpm_release}.${dist}.x86_64"
 
 
 
 make_pacemaker_repo
 make_pacemaker_debuginfo_repo
 $buildsrc && make_pacemaker_src_repo
-compress_dir
 
 if $do_cleanup; then
     rm -rf $REPO_DIR
