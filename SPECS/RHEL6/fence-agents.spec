@@ -22,6 +22,7 @@ Group: System Environment/Base
 URL: http://sources.redhat.com/cluster/wiki/
 Source0: %{name}-%{version}.tar.bz2
 
+Patch0: 0021-revert.patch
 
 ExclusiveArch: i686 x86_64
 
@@ -63,6 +64,7 @@ BuildRequires: device-mapper-multipath
 %prep
 %setup -q -n %{name}-%{version}
 
+%patch0 -p1 -b .revert21
 
 %build
 ./autogen.sh
