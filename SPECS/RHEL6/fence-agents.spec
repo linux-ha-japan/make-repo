@@ -15,47 +15,13 @@
 
 Name: fence-agents
 Summary: Fence Agents for Red Hat Cluster
-Version: 4.0.15
-Release: 8%{?alphatag:.%{alphatag}}%{?dist}
+Version: 4.0.19
+Release: 1%{?alphatag:.%{alphatag}}%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
 URL: http://sources.redhat.com/cluster/wiki/
-Source0: https://fedorahosted.org/releases/f/e/fence-agents/%{name}-%{version}.tar.bz2
+Source0: %{name}-%{version}.tar.bz2
 
-Patch0: 0001-revert.patch
-Patch1: 0002-revert.patch
-Patch2: 0003-revert.patch
-Patch3: 0004-revert.patch
-Patch4: 0005-revert.patch
-Patch5: 0006-revert.patch
-Patch6: 0007-revert.patch
-Patch7: 0008-revert.patch
-Patch8: 0009-revert.patch
-Patch9: 0010-revert.patch
-Patch10: 0011-revert.patch
-Patch11: 0012-revert.patch
-Patch12: 0013-revert.patch
-Patch13: 0014-revert.patch
-Patch14: 0015-revert.patch
-Patch15: 0016-revert.patch
-Patch16: 0017-revert.patch
-Patch17: 0018-revert.patch
-Patch18: 0019-revert.patch
-Patch19: 0020-revert.patch
-Patch20: 0021-revert.patch
-Patch21: 0022-revert.patch
-Patch22: 0023-revert.patch
-Patch23: 0024-revert.patch
-Patch24: bz1094515-fence_kdump-monitor.patch
-Patch25: bz1094515-2-fence_kdump-monitor.patch
-Patch26: bz1094515-3-fence_kdump-monitor.patch
-Patch27: bz1094515-4-fence_kdump-monitor.patch
-Patch28: bz1049805-rebase_ipmi_unset_cipher.patch
-Patch29: bz1049805-rebase_bladecenter.patch
-Patch30: bz1049805-rebase_remove_python_scsi.patch
-Patch31: bz1049805-rebase_tls.patch
-Patch32: bz1118008-1-fence_mpath_metadata.patch
-Patch33: bz1118008-2-fence_mpath_metadata.patch
 
 ExclusiveArch: i686 x86_64
 
@@ -63,7 +29,7 @@ ExclusiveArch: i686 x86_64
 %global supportedagents apc apc_snmp bladecenter brocade cisco_mds cisco_ucs drac drac5 eaton_snmp emerson eps hpblade kdump ibmblade ifmib ilo ilo_moonshot ilo_mp ilo_ssh intelmodular ipdu ipmilan manual mpath rhevm rsb scsi wti vmware_soap
 %global deprecated rsa sanbox2
 %global testagents virsh vmware
-%global requiresthirdparty egenera
+%global requiresthirdparty %{nil}
 
 ## Runtime deps
 Requires: sg3_utils telnet openssh-clients
@@ -97,40 +63,6 @@ BuildRequires: device-mapper-multipath
 %prep
 %setup -q -n %{name}-%{version}
 
-%patch0 -p1 -b .revert01
-%patch1 -p1 -b .revert02
-%patch2 -p1 -b .revert03
-%patch3 -p1 -b .revert04
-%patch4 -p1 -b .revert05
-%patch5 -p1 -b .revert06
-%patch6 -p1 -b .revert07
-%patch7 -p1 -b .revert08
-%patch8 -p1 -b .revert09
-%patch9 -p1 -b .revert10
-%patch10 -p1 -b .revert11
-%patch11 -p1 -b .revert12
-%patch12 -p1 -b .revert13
-%patch13 -p1 -b .revert14
-%patch14 -p1 -b .revert15
-%patch15 -p1 -b .revert16
-%patch16 -p1 -b .revert17
-%patch17 -p1 -b .revert18
-%patch18 -p1 -b .revert19
-%patch19 -p1 -b .revert20
-%patch20 -p1 -b .revert21
-%patch21 -p1 -b .revert22
-%patch22 -p1 -b .revert23
-%patch23 -p1 -b .revert24
-%patch24 -p1 -b .bz1094515
-%patch25 -p1 -b .bz1094515.2
-%patch26 -p1 -b .bz1094515.3
-%patch27 -p1 -b .bz1094515.4
-%patch28 -p1 -b .bz1049805.1
-%patch29 -p1 -b .bz1049805.2
-%patch30 -p1 -b .bz1049805.3
-%patch31 -p1 -b .bz1049805.4
-%patch32 -p1 -b .bz1118008.1
-%patch33 -p1 -b .bz1118008.2
 
 %build
 ./autogen.sh
