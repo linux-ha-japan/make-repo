@@ -1,6 +1,6 @@
 Name: pcs		
-Version: 0.9.139
-Release: 8%{?dist}
+Version: 0.9.141
+Release: 1%{?dist}
 License: GPLv2
 URL: http://github.com/feist/pcs
 Group: System Environment/Base
@@ -10,12 +10,6 @@ Requires: ruby rubygems ccs
 Requires: python-clufter
 Summary: Pacemaker Configuration System	
 Source0: http://people.redhat.com/cfeist/pcs/pcs-withgems-%{version}.tar.gz
-Patch0: bz1184763-Warn-if-node-removal-will-cause-a-loss-of-the-quorum.patch
-Patch1: bz1168982-Fix-standby-unstandby-local-node.patch
-Patch2: bz1171312-1-Fix-tarball-creation-on-import-cman.patch
-Patch3: bz1171312-2-Fix-passing-parameters-to-python-clufter.patch
-Patch4: rhel6.patch
-Patch5: disable-gui.patch
 
 %description
 pcs is a corosync and pacemaker configuration tool.  It permits users to
@@ -23,12 +17,6 @@ easily view, modify and created pacemaker based clusters.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1 -b .rhel6
-%patch5 -p1 -b .disable-gui
 
 %build
 
