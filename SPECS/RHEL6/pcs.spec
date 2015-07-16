@@ -5,11 +5,10 @@ License: GPLv2
 URL: http://github.com/feist/pcs
 Group: System Environment/Base
 ExclusiveArch: i686 x86_64
-BuildRequires: python2-devel rubygems ruby-devel pam-devel
-Requires: ruby rubygems ccs
-Requires: python-clufter
+BuildRequires: python2-devel ruby-devel pam-devel
+Requires: ruby
 Summary: Pacemaker Configuration System	
-Source0: http://people.redhat.com/cfeist/pcs/pcs-withgems-%{version}.tar.gz
+Source0: pcs-%{version}.tar.gz
 
 %description
 pcs is a corosync and pacemaker configuration tool.  It permits users to
@@ -22,6 +21,7 @@ easily view, modify and created pacemaker based clusters.
 
 %install
 rm -rf $RPM_BUILD_ROOT
+export BUILD_GEMS=false
 make install DESTDIR=$RPM_BUILD_ROOT PYTHON_SITELIB=%{python_sitelib}
 make install_pcsd DESTDIR=$RPM_BUILD_ROOT PYTHON_SITELIB=%{python_sitelib} hdrdir="%{_includedir}" rubyhdrdir="%{_includedir}" includedir="%{_includedir}" initdir="%{_initrddir}"
 chmod 755 $RPM_BUILD_ROOT/%{python_sitelib}/pcs/pcs.py
@@ -44,8 +44,6 @@ fi
 %{python_sitelib}/pcs-%{version}-py2.*.egg-info
 /usr/sbin/pcs
 /usr/lib/pcsd/*
-/usr/lib/pcsd/.bundle/config
-/usr/lib/pcsd/.gitignore
 %{_initrddir}/pcsd
 /var/lib/pcsd
 /etc/pam.d/pcsd
