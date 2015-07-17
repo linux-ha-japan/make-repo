@@ -15,18 +15,19 @@
 
 Name: fence-agents
 Summary: Fence Agents for Red Hat Cluster
-Version: 4.0.10
+Version: 4.0.19
 Release: 1%{?alphatag:.%{alphatag}}%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
 URL: http://sources.redhat.com/cluster/wiki/
-Source0: fence-agents/%{name}-%{version}.tar.bz2
+Source0: %{name}-%{version}.tar.bz2
 
+Patch0: 0021-revert.patch
 
 ExclusiveArch: i686 x86_64
 
 # shipped agents
-%global supportedagents apc apc_snmp bladecenter brocade cisco_mds cisco_ucs drac drac5 eaton_snmp eps hpblade kdump ibmblade ifmib ilo ilo_mp intelmodular ipdu ipmilan manual rhevm rsb scsi wti vmware_soap
+%global supportedagents apc apc_snmp bladecenter brocade cisco_mds cisco_ucs compute drac drac5 eaton_snmp emerson eps hpblade kdump ibmblade ifmib ilo ilo_moonshot ilo_mp ilo_ssh intelmodular ipdu ipmilan manual mpath rhevm rsb scsi wti vmware_soap
 %global deprecated rsa sanbox2
 %global testagents virsh vmware
 %global requiresthirdparty %{nil}
@@ -35,7 +36,7 @@ ExclusiveArch: i686 x86_64
 Requires: sg3_utils telnet openssh-clients
 Requires: pexpect net-snmp-utils
 Requires: perl-Net-Telnet python-pycurl pyOpenSSL
-Requires: python-suds
+Requires: python-suds gnutls-utils
 
 # This is required by fence_virsh. Per discussion on fedora-devel
 # switching from package to file based require.
@@ -58,10 +59,12 @@ BuildRequires: python-pycurl
 BuildRequires: python-suds
 BuildRequires: automake autoconf pkgconfig libtool
 BuildRequires: net-snmp-utils perl-Net-Telnet
+BuildRequires: device-mapper-multipath
 
 %prep
 %setup -q -n %{name}-%{version}
 
+%patch0 -p1 -b .revert21
 
 %build
 ./autogen.sh
@@ -72,7 +75,7 @@ CFLAGS="$(echo '%{optflags}')" make %{_smp_mflags}
 
 %install
 rm -rf %{buildroot}
-make -C fence/agents install DESTDIR=%{buildroot}
+make install DESTDIR=%{buildroot}
 
 ## tree fix up
 # fix libfence permissions
@@ -97,12 +100,100 @@ power management for several devices.
 %defattr(-,root,root,-)
 %doc doc/COPYING.* doc/COPYRIGHT doc/README.licence
 %{_sbindir}/fence*
-%{_libexecdir}/fence*
 %{_datadir}/fence
 %{_datadir}/cluster
 %{_mandir}/man8/fence*
 
 %changelog
+* Thu Mar 26 2015 Marek Grac <mgrac@redhat.com> - 4.0.15-8
+- fix fence2rng to handle quotes
+  Resolves: rhbz#1118008
+
+* Tue Mar 24 2015 Marek Grac <mgrac@redhat.com> - 4.0.15-7
+- fence_scsi: remove new pythonic version
+- fence_ipmilan: unset default cipher
+- fence_ilo2: add options --tls1.0
+- fence_bladecenter: fix login process
+  Resolves: rhbz#1049805
+
+* Mon Mar 02 2015 Marek Grac <mgrac@redhat.com> - 4.0.15-6
+- fence_kdump: Fix problems found by Coverity
+  Resolves: rhbz#1094515
+
+* Thu Feb 26 2015 Marek Grac <mgrac@redhat.com> - 4.0.15-5
+- fence_ilo_ssh: New fence agent
+  Resolves: rhbz#1111482
+- fence_kdump: Update metadata for 'monitor'
+  Resolves: rhbz#1094515
+
+* Wed Feb 25 2015 Marek Grac <mgrac@redhat.com> - 4.0.15-4
+- fence_ilo_moonshot: New fence agent for HP Moonshot
+  Resolves: rhbz#1099551
+- fence_mpath: New fence agent for multipath devices
+  Resolves: rhbz#1118008
+
+* Wed Feb 25 2015 Marek Grac <mgrac@redhat.com> - 4.0.15-3
+- fence_kdump: Doesn't support 'monitor'
+  Resolves: rhbz#1094515
+
+* Thu Feb 19 2015 Marek Grac <mgrac@redhat.com> - 4.0.15-2
+- rebase of fence agents with reverts for backward compatibility
+  Resolves: rhbz#1049805
+
+* Wed Feb 18 2015 Marek Grac <mgrac@redhat.com> - 4.0.15-1
+- rebase of fence agents with reverts for backward compatibility
+  Resolves: rhbz#1049805
+
+* Thu Jul 10 2014 Marek Grac <mgrac@redhat.com> - 3.0.15-48
+- fencing: fix issue with "io_fencing" in metadata
+  Resolves: rhbz#1114559
+
+* Wed Jul 02 2014 Marek Grac <mgrac@redhat.com> - 3.0.15-47
+- fence_brocade: add support for list to allow monitor
+  Resolves: rhbz#1114528
+
+* Tue Jul 01 2014 Marek Grac <mgrac@redhat.com> - 3.0.15-44
+- fence_brocade: fix default action
+  Resolves: rhbz#1114559
+- fence_brocade: add support for list to allow monitor
+  Resolves: rhbz#1114528
+
+* Thu Jun 26 2014 Marek Grac <mgrac@redhat.com> - 3.0.15-43
+- fix quoes in fence_ilo
+  Resolves: rhbz#990537
+- fix delay support for agents without off/reboot
+  Resolves: rhbz#641632
+
+* Mon Jun 23 2014 Marek Grac <mgrac@redhat.com> - 3.0.15-42
+- fence_scsi_check can do hard reboot now
+  Resolves: rhbz#1050022
+
+* Fri Jun 20 2014 Marek Grac <mgrac@redhat.com> - 3.0.15-41
+- fence_brocade ported to fencing library
+  Resolves: rhbz#641632 rhbz#642232 rhbz#841556
+- fence_rsb fails to power devices on with certain firmwares
+  Resolves: rhbz#1110428
+
+* Wed Jun 18 2014 Marek Grac <mgrac@redhat.com> - 3.0.15-40
+- fencing: Add option --ssh-options
+  Resolves: rhbz#1069618
+- fence_vmware_soap: python exception when user does not have privileges
+  Resolves: rhbz#1018263
+- fence_wti: Add support for delay
+  Resolves: rhbz#1079291
+- fence_ilo: Unable to enter password with "
+  Resolves: rhbz#990537
+- fencing: Fence agent uses key authentication when it should use password
+  Resolves: rhbz#1048842
+
+* Fri Mar 14 2014 Marek Grac <mgrac@redhat.com> - 3.0.15-39
+- fencing: fix exception when identity file is used
+  Resolves: rhbz#1075683
+
+* Fri Jan 24 2014 Marek Grac <mgrac@redhat.com> - 3.0.15-38
+- fence_vmware_soap: Add delay option
+  Resolves: rhbz#1051159
+
 * Mon Oct 07 2013 Marek Grac <mgrac@redhat.com> - 3.0.15-35
 - fence_vmware_soap: Fix symlink vulnerability caused by python-suds temp directory
   Resolves: rhbz#1014000
@@ -121,7 +212,7 @@ power management for several devices.
 - fencing: Improve detection of EOL during login
   Resolves: rhbz#886614
 
-* Wed Jul 18 2013 Marek Grac <mgrac@redhat.com> - 3.0.15-31
+* Thu Jul 18 2013 Marek Grac <mgrac@redhat.com> - 3.0.15-31
 - improve description of lanplus parameter in fence ipmilan agent
   Resolves: rhbz#981086
 
@@ -339,7 +430,7 @@ power management for several devices.
   (fence_cisco_ucs-Fix-for-support-for-sub-organization.patch)
   Resolves: rhbz#678904
 
-* Mon Mar 20 2011 Marek Grac <mgrac@redhat.com> - 3.0.12-21
+* Mon Mar 21 2011 Marek Grac <mgrac@redhat.com> - 3.0.12-21
 - fence_rhevm: Update URL for RHEV-M REST API
   (fence_rhevm-Update-URL-to-RHEV-M-REST-API.patch)
   Resolves: rhbz#681674
