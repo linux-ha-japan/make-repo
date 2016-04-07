@@ -61,6 +61,9 @@ Url:           http://www.clusterlabs.org
 Group:         System Environment/Daemons
 
 Source0:        https://github.com/%{github_owner}/%{name}/archive/%{commit}/%{name}-%{commit}.tar.gz
+Patch1:        01-eff10246.patch
+Patch2:        02-98457d16.patch
+
 BuildRoot:     %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 AutoReqProv:   on
 Requires:      python
@@ -251,6 +254,7 @@ manager for Corosync, CMAN and/or Linux-HA.
 
 %prep
 %setup -q -n %{name}-%{commit}
+%autopatch -p1
 
 # Force the local time
 #
