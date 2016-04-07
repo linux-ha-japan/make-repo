@@ -269,6 +269,7 @@ docdir=%{pcmk_docdir} %{configure}                 \
         %{?with_coverage:    --with-coverage}      \
         %{!?with_cman:       --without-cman}       \
         --without-heartbeat			   \
+        --enable-fatal-warnings=no \
         --with-snmp \
         --with-initdir=%{_initrddir}               \
         --localstatedir=%{_var}                    \
