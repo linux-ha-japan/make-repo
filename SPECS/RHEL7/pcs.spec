@@ -1,6 +1,6 @@
 Name: pcs		
-Version: 0.9.143
-Release: 15%{?dist}
+Version: 0.9.149
+Release: 1%{?dist}
 License: GPLv2
 URL: http://github.com/feist/pcs
 Group: System Environment/Base
@@ -9,39 +9,6 @@ BuildRequires: python2-devel
 Summary: Pacemaker Configuration System	
 Source0: https://tojeline.fedorapeople.org/pkgs/pcs/pcs-withgems-%{version}.tar.gz
 Source1: HAM-logo.png
-Patch0: bz1122818-01-fix-resource-relocation-of-globally-unique-clones.patch
-Patch1: bz1158577-01-improve-logging-in-pcsd.patch
-Patch2: bz1189857-01-fix-Add-Resource-form-in-web-UI.patch
-Patch3: bz1235022-01-add-nagios-support-to-pcs-resource-list-and-web-UI.patch
-Patch4: bz1122818-02-fix-resource-relocate-for-remote-nodes.patch
-Patch5: bz1253491-01-fix-pcs-pcsd-path-detection.patch
-Patch6: bz1253294-01-fixed-command-injection-vulnerability.patch
-Patch7: bz1258619-01-fix-ruby-traceback-on-pcsd-startup.patch
-Patch8: bz1158577-02-fix-certificates-syncing.patch
-Patch9: bz1189857-02-fix-tree-view-of-resources-in-web-UI.patch
-Patch10: bz1158566-01-fix-dashboard-in-web-UI.patch
-Patch11: bz1189857-03-web-UI-prevents-running-update-multiple-times-at-onc.patch
-Patch12: bz1189857-04-fix-constraints-removing-in-web-UI.patch
-Patch13: bz1158571-01-web-UI-mark-unsaved-permissions-forms.patch
-Patch14: bz1189857-05-remove-removing-constriants-from-client-side-javascr.patch
-Patch15: bz1235022-02-fix-crash-when-missing-nagios-metadata.patch
-Patch16: bz1158571-02-check-and-refresh-user-auth-info-upon-each-request.patch
-Patch17: bz1257369-01-always-print-output-of-crm_resource-cleanup.patch
-Patch18: bz1158566-02-fix-loading-cluster-status-for-web-UI.patch
-Patch19: bz1158569-01-fixed-a-typo-in-an-error-message.patch
-Patch20: bz1158571-03-fix-checking-user-s-group-membership.patch
-Patch21: bz1188361-01-Make-port-parameter-of-fence-agents-optional.patch
-Patch22: bz1158569-02-fix-authentication-in-web-UI.patch
-Patch23: bz1158566-03-web-UI-multiple-fixes-in-the-dashboard.patch
-Patch24: bz1198640-01-web-UI-allows-spaces-in-optional-arguments-when-crea.patch
-Patch25: bz1189857-06-web-UI-fixes-in-nodes-resources-fence-devices.patch
-Patch26: bz1245264-01-Added-more-detailed-warnings-for-pcs-stonith-confirm.patch
-Patch27: bz1189857-07-web-UI-fixes.patch
-Patch28: bz1265425-01-Fix-for-crm_node-l-output-change.patch
-Patch29: bz1268801-Fixed-issue-with-resource-manage-not-removing-meta-a.patch
-Patch30: bz1268801-Fixes-for-managing-special-cases-of-unmanaged-resour.patch
-Patch31: bz1268801-Fixes-for-managing-special-cases-of-unmanaged-resour-2.patch
-Patch32: bz1272412-01-fix-setting-cluster-properties-in-web-UI.patch
 
 BuildRequires: ruby >= 2.0.0 ruby-devel rubygems pam-devel git
 BuildRequires: systemd-units rubygem-bundler
