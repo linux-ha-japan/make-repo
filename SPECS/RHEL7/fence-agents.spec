@@ -15,89 +15,12 @@
 
 Name: fence-agents
 Summary: Fence Agents for Red Hat Cluster
-Version: 4.0.11
-Release: 27%{?alphatag:.%{alphatag}}%{?dist}.5
+Version: 4.0.22
+Release: 1%{?alphatag:.%{alphatag}}%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
 URL: http://sourceware.org/cluster/wiki/
-Source0: https://fedorahosted.org/releases/f/e/fence-agents/%{name}-%{version}.tar.xz
-Patch0: bz1072564-1-add_ssl_secure_and_ssl_insecure.patch
-Patch1: bz1072564-2-add_ssl_secure_and_ssl_insecure.patch
-Patch2: backward-rename_fence_scsi_check_to_pl.patch
-Patch3: bz1121122-1-fence_ilo_ssh.patch
-Patch4: bz1140921-1-fence_zvm.patch
-Patch5: bz1111597-1-fence_rsb.patch
-Patch6: bz1148762-1-fence_wti_eol.patch
-Patch7: bz1153059-1-fence_vmware_soap-fail_usage.patch
-Patch8: bz1111599-1-fence_cisco_and_soap_logout.patch
-Patch9: bz1162092-1-fix_ssl_secure.patch
-Patch10: bz1140921-2-fence_zvm.patch
-Patch11: bz1140921-3-fence_zvm.patch
-Patch12: bz1121122-2-broken_syslog.patch
-Patch13: bz1121122-3-eol_changed.patch
-Patch14: bz1121122-3.5-delay_test.patch
-Patch15: bz1121122-4-symlink_ilo34_ssh.patch
-Patch16: bz1121122-5-symlink_ilo34_ssh.patch
-Patch17: bz1173178-1-rewrite_fence_zvmip.patch
-Patch18: tests-01.patch
-Patch19: tests-02.patch
-Patch20: bz1199970-fence_ilo_support_tls10.patch
-Patch21: bz1203877-fence_ipmilan-default_cipher.patch
-Patch22: bz1214359-1-fence_compute.patch
-Patch23: bz1214359-2-fence_compute.patch
-Patch24: bz1214359-3-fence_compute.patch
-Patch25: bz1214359-4-fence_compute.patch
-Patch26: test-01-fix_xml_metadata.patch
-Patch27: bz1213571-fence_scsi-add_monitor.patch
-Patch28: bz1214919-fence_scsi-already_on.patch
-Patch29: bz1145769-fence_rhevm-cookies_auth.patch
-Patch30: bz1165591-fence_cisco_ucs-https.patch
-Patch31: bz1196068-fence_kdump-add_monitor.patch
-Patch32: bz1196068-2-fence_kdump-add_monitor.patch
-Patch33: bz1196068-3-fence_kdump-add_monitor.patch
-Patch34: bz1196068-4-fence_kdump-add_monitor.patch
-Patch35: bz1207982-fence2rng-quotes.patch
-Patch36: bz1171732-1-fence_emerson.patch
-Patch37: bz1171732-2-fence_emerson.patch
-Patch38: bz1171732-3-fence_emerson.patch
-Patch39: bz1188750-0-fence_zvmip-improve_usage_of_resources.patch
-Patch40: bz1188750-fence_zvmip-improve_usage_of_resources.patch
-Patch41: bz1214359-5-fence_compute.patch
-Patch42: bz1214359-6-fence_compute.patch
-Patch43: bz1216997-support_for_hp_superdome.patch
-Patch44: bz1102727-fence_mpath.patch
-Patch45: bz1102727-2-duplicate_getopt.patch
-Patch46: bz1214359-7-fence_compute_xml_test.patch
-Patch47: bz1214522-port_as_ip.patch
-Patch48: bz1102727-2-fence_mpath.patch
-Patch49: bz1243485-1-fence_scsi-force-on.patch
-Patch50: bz1243485-2-fence_scsi-monitor.patch
-Patch51: bz1250586-list_status.patch
-Patch52: bz1214522-2-port_as_ip.patch
-Patch53: bz1214522-3-port_as_ip.patch
-Patch54: bz1185329-fence_rsa.patch
-Patch55: bz1251491-none_as_state.patch
-Patch56: bz1214522-4-port_as_ip.patch
-Patch57: bz1214522-5-port_as_ip.patch
-Patch58: bz1102727-3-fence_mpath.patch
-Patch59: bz1250586-2-list_status.patch
-Patch60: bz1243485-3-fence_scsi_check.patch
-Patch61: bz1241648-fence_ipmilan_password_verbose.patch
-Patch62: bz1257137-1-fence_ipmilan_regression.patch
-Patch63: bz1257137-2-fence_ipmilan_regression.patch
-Patch64: bz1256908-fence_ilo-tls_negotiation.patch
-Patch65: bz1259319-fence_apc_v6.patch
-Patch66: bz1257137-3-fence_ipmilan_regression.patch
-Patch67: bz1274432-fence_brocade-fix_incorrect_return.patch
-Patch68: bz1265426-1-fence_scsi_hard.patch
-Patch69: bz1265426-2-fence_scsi_hard.patch
-Patch70: bz1265426-3-fence_scsi_hard.patch
-Patch71: bz1265426-4-fence_scsi_hard.patch
-Patch72: bz1299577-fence_compute.patch
-Patch73: bz1303698-fence_cisco_ucs-Obtain-status-of-device-from-differe.patch
-Patch74: bz1303698-2-fence_cisco_ucs-Add-missing-as-off.patch
-Patch75: bz1303698-3-fence_cisco_ucs-Update-XML-metadata.patch
-Patch76: bz1303698-4-fence_cisco_ucs-Update-XML-metadata.patch
+Source0: fence-agents/%{name}-%{version}.tar.xz
 
 %if 0%{?rhel}
 %global supportedagents apc apc_snmp bladecenter brocade cisco_mds cisco_ucs compute drac5 eaton_snmp emerson eps hpblade ibmblade ifmib ilo ilo_moonshot ilo_mp ilo_ssh intelmodular ipdu ipmilan mpath kdump rhevm rsa rsb scsi vmware_soap wti
@@ -123,83 +46,6 @@ BuildRequires: autoconf automake libtool
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch0 -p1 -b .bz1072564-1
-%patch1 -p1 -b .bz1072564-2
-%patch2 -p1 -b .backward-fence_scsi_check_rename
-%patch3 -p1 -b .bz1121122-1
-%patch4 -p1 -b .bz1140921-1
-%patch5 -p1 -b .bz1111597-1
-%patch6 -p1 -b .bz1148762-1
-%patch7 -p1 -b .bz1153059-1
-%patch8 -p1 -b .bz1111599-1
-%patch9 -p1 -b .bz1162092-1
-%patch10 -p1 -b .bz1140921-2
-%patch11 -p1 -b .bz1140921-3
-%patch12 -p1 -b .bz1121122-2
-%patch13 -p1 -b .bz1121122-3
-%patch14 -p1 -b .bz1121122-3.5
-%patch15 -p1 -b .bz1121122-4
-%patch16 -p1 -b .bz1121122-5
-%patch17 -p1 -b .bz1173178-1
-%patch18 -p1 -b .tests-01
-%patch19 -p1 -b .tests-02
-%patch20 -p1 -b .bz1199970-1
-%patch21 -p1 -b .bz1203877-1
-%patch22 -p1 -b .bz1214359-1
-%patch23 -p1 -b .bz1214359-2
-%patch24 -p1 -b .bz1214359-3
-%patch25 -p1 -b .bz1214359-4
-%patch26 -p1 -b .test-01-fix_xml_metadata.patch
-%patch27 -p1 -b .bz1213571
-%patch28 -p1 -b .bz1214919
-%patch29 -p1 -b .bz1145769
-%patch30 -p1 -b .bz1165591
-%patch31 -p1 -b .bz1196068
-%patch32 -p1 -b .bz1196068-2
-%patch33 -p1 -b .bz1196068-3
-%patch34 -p1 -b .bz1196068-4
-%patch35 -p1 -b .bz1207982
-%patch36 -p1 -b .bz1171732.1
-%patch37 -p1 -b .bz1171732.2
-%patch38 -p1 -b .bz1171732.3
-%patch39 -p1 -b .bz1188750.0
-%patch40 -p1 -b .bz1188750
-%patch41 -p1 -b .bz1214359-5
-%patch42 -p1 -b .bz1214359-6
-%patch43 -p1 -b .bz1216997
-%patch44 -p1 -b .bz1102727
-%patch45 -p1 -b .bz1102727-2
-%patch46 -p1 -b .bz1214359-7
-%patch47 -p1 -b .bz1214522
-%patch48 -p1 -b .bz1102727-2
-%patch49 -p1 -b .bz1243485-1
-%patch50 -p1 -b .bz1243485-2
-%patch51 -p1 -b .bz1250586
-%patch52 -p1 -b .bz1214522-2
-%patch53 -p1 -b .bz1214522-3
-%patch54 -p1 -b .bz1185329
-%patch55 -p1 -b .bz1251491
-%patch56 -p1 -b .bz1214522-4
-%patch57 -p1 -b .bz1214522-5
-%patch58 -p1 -b .bz1102727-3
-%patch59 -p1 -b .bz1250586-2
-%patch60 -p1 -b .bz1243485-3
-%patch61 -p1 -b .bz1241648
-%patch62 -p1 -b .bz1257137-1
-%patch63 -p1 -b .bz1257137-2
-%patch64 -p1 -b .bz1256908
-%patch65 -p1 -b .bz1259319
-%patch66 -p1 -b .bz1257137-3
-%patch67 -p1 -b .bz1274432-1
-%patch68 -p1 -b .bz1265426-1
-%patch69 -p1 -b .bz1265426-2
-%patch70 -p1 -b .bz1265426-3
-%patch71 -p1 -b .bz1265426-4
-%patch72 -p1 -b .bz1299577
-%patch73 -p1 -b .bz1303698
-%patch74 -p1 -b .bz1303698-2
-%patch75 -p1 -b	.bz1303698-3
-%patch76 -p1 -b	.bz1303698-4
 
 %build
 ./autogen.sh
