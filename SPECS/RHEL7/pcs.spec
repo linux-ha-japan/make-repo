@@ -7,15 +7,14 @@ Group: System Environment/Base
 #BuildArch: x86_64
 BuildRequires: python2-devel
 Summary: Pacemaker Configuration System	
-Source0: https://tojeline.fedorapeople.org/pkgs/pcs/pcs-withgems-%{version}.tar.gz
-Source1: HAM-logo.png
+Source0: pcs-%{version}.tar.gz
 
 BuildRequires: ruby >= 2.0.0 ruby-devel rubygems pam-devel git
 BuildRequires: systemd-units rubygem-bundler
 Requires(post): systemd
 Requires(preun): systemd
 Requires(postun): systemd
-Requires: pacemaker-cli corosync ruby >= 2.0.0 pacemaker python-clufter
+Requires: pacemaker-cli corosync ruby >= 2.0.0 pacemaker
 Requires: psmisc initscripts openssl
 
 Provides: bundled(rubygem-backports) = 3.6.4
@@ -40,13 +39,12 @@ easily view, modify and created pacemaker based clusters.
 %prep
 %autosetup -p1 -S git
 
-cp -f %SOURCE1 pcsd/public/images
-
 %build
 
 %install
 rm -rf $RPM_BUILD_ROOT
 pwd
+export BUILD_GEMS=false
 make install DESTDIR=$RPM_BUILD_ROOT PYTHON_SITELIB=%{python_sitelib}
 make install_pcsd DESTDIR=$RPM_BUILD_ROOT PYTHON_SITELIB=%{python_sitelib} hdrdir="%{_includedir}" rubyhdrdir="%{_includedir}" includedir="%{_includedir}"
 chmod 755 $RPM_BUILD_ROOT/%{python_sitelib}/pcs/pcs.py
@@ -69,7 +67,6 @@ chmod 755 $RPM_BUILD_ROOT/%{python_sitelib}/pcs/pcs.py
 %{python_sitelib}/pcs-%{version}-py2.*.egg-info
 /usr/sbin/pcs
 /usr/lib/pcsd/*
-/usr/lib/pcsd/.bundle/config
 /usr/lib/systemd/system/pcsd.service
 /var/lib/pcsd
 /etc/pam.d/pcsd
