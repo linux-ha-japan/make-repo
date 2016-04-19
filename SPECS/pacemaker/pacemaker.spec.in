@@ -254,7 +254,8 @@ manager for Corosync, CMAN and/or Linux-HA.
 
 %prep
 %setup -q -n %{name}-%{commit}
-%autopatch -p1
+%patch1 -p1
+%patch2 -p1
 
 # Force the local time
 #
