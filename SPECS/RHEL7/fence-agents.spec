@@ -23,8 +23,8 @@ URL: http://sourceware.org/cluster/wiki/
 Source0: fence-agents/%{name}-%{version}.tar.xz
 
 %if 0%{?rhel}
-%global supportedagents apc apc_snmp bladecenter brocade cisco_mds cisco_ucs compute drac5 eaton_snmp emerson eps hpblade ibmblade ifmib ilo ilo_moonshot ilo_mp ilo_ssh intelmodular ipdu ipmilan mpath kdump rhevm rsa rsb sbd scsi vbox vmware_soap wti
-%global allfenceagents fence-agents-apc fence-agents-apc-snmp fence-agents-bladecenter fence-agents-brocade fence-agents-cisco-mds fence-agents-cisco-ucs fence-agents-compute fence-agents-drac5 fence-agents-eaton-snmp fence-agents-emerson fence-agents-eps fence-agents-hpblade fence-agents-ibmblade fence-agents-ifmib fence-agents-ilo2 fence-agents-ilo-moonshot fence-agents-ilo-mp fence-agents-ilo-ssh fence-agents-intelmodular fence-agents-ipdu fence-agents-ipmilan fence-agents-mpath fence-agents-kdump fence-agents-rhevm fence-agents-rsa fence-agents-rsb fence-agents-sbd fence-agents-scsi fence-agents-vbox fence-agents-vmware-soap fence-agents-wti
+%global supportedagents apc apc_snmp bladecenter brocade cisco_mds cisco_ucs compute docker drac5 eaton_snmp emerson eps hpblade ibmblade ifmib ilo ilo_moonshot ilo_mp ilo_ssh intelmodular ipdu ipmilan mpath kdump rhevm rsa rsb sbd scsi vbox vmware_soap wti
+%global allfenceagents fence-agents-apc fence-agents-apc-snmp fence-agents-bladecenter fence-agents-brocade fence-agents-cisco-mds fence-agents-cisco-ucs fence-agents-compute fence-agents-docker fence-agents-drac5 fence-agents-eaton-snmp fence-agents-emerson fence-agents-eps fence-agents-hpblade fence-agents-ibmblade fence-agents-ifmib fence-agents-ilo2 fence-agents-ilo-moonshot fence-agents-ilo-mp fence-agents-ilo-ssh fence-agents-intelmodular fence-agents-ipdu fence-agents-ipmilan fence-agents-mpath fence-agents-kdump fence-agents-rhevm fence-agents-rsa fence-agents-rsb fence-agents-sbd fence-agents-scsi fence-agents-vbox fence-agents-vmware-soap fence-agents-wti
 %ifarch s390x
 %global testagents virsh zvm
 %else
@@ -213,6 +213,20 @@ The fence-agents-compute package contains a fence agent for Nova compute nodes.
 %defattr(-,root,root,-)
 %{_sbindir}/fence_compute
 %{_mandir}/man8/fence_compute.8*
+
+%package docker
+License: GPLv2+ and LGPLv2+
+Group: System Environment/Base
+Summary: Fence agent for Docker
+Requires: pycurl
+Requires: fence-agents-common = %{version}-%{release}
+Obsoletes: fence-agents
+%description docker
+The fence-agents-docker package contains a fence agent for Docker images that are accessed over HTTP.
+%files docker
+%defattr(-,root,root,-)
+%{_sbindir}/fence_docker
+%{_mandir}/man8/fence_docker.8*
 
 %package drac5
 License: GPLv2+ and LGPLv2+
