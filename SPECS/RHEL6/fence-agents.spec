@@ -27,7 +27,7 @@ Patch0: 0021-revert.patch
 ExclusiveArch: i686 x86_64
 
 # shipped agents
-%global supportedagents apc apc_snmp bladecenter brocade cisco_mds cisco_ucs compute drac drac5 eaton_snmp emerson eps hpblade kdump ibmblade ifmib ilo ilo_moonshot ilo_mp ilo_ssh intelmodular ipdu ipmilan manual mpath rhevm rsb sbd scsi vbox vmware_soap wti
+%global supportedagents apc apc_snmp bladecenter brocade cisco_mds cisco_ucs compute docker drac drac5 eaton_snmp emerson eps hpblade kdump ibmblade ifmib ilo ilo_moonshot ilo_mp ilo_ssh intelmodular ipdu ipmilan manual mpath rhevm rsb sbd scsi vbox vmware_soap wti
 %global deprecated rsa sanbox2
 %global testagents virsh vmware
 %global requiresthirdparty %{nil}
