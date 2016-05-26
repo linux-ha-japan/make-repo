@@ -15,7 +15,7 @@
 
 Name: fence-agents
 Summary: Fence Agents for Red Hat Cluster
-Version: 4.0.19
+Version: 4.0.22
 Release: 1%{?alphatag:.%{alphatag}}%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
@@ -23,8 +23,8 @@ URL: http://sourceware.org/cluster/wiki/
 Source0: fence-agents/%{name}-%{version}.tar.xz
 
 %if 0%{?rhel}
-%global supportedagents apc apc_snmp bladecenter brocade cisco_mds cisco_ucs compute drac5 eaton_snmp eps hpblade ibmblade ifmib ilo ilo_mp ilo_ssh intelmodular ipdu ipmilan kdump rhevm rsb scsi vmware_soap wti
-%global allfenceagents fence-agents-apc fence-agents-apc-snmp fence-agents-bladecenter fence-agents-brocade fence-agents-cisco-mds fence-agents-cisco-ucs fence-agents-compute fence-agents-drac5 fence-agents-eaton-snmp fence-agents-eps fence-agents-hpblade fence-agents-ibmblade fence-agents-ifmib fence-agents-ilo2 fence-agents-ilo-mp fence-agents-ilo-ssh fence-agents-intelmodular fence-agents-ipdu fence-agents-ipmilan fence-agents-kdump fence-agents-rhevm fence-agents-rsb fence-agents-scsi fence-agents-vmware-soap fence-agents-wti
+%global supportedagents apc apc_snmp bladecenter brocade cisco_mds cisco_ucs compute docker drac5 eaton_snmp emerson eps hpblade ibmblade ifmib ilo ilo_moonshot ilo_mp ilo_ssh intelmodular ipdu ipmilan mpath kdump rhevm rsa rsb sbd scsi vbox vmware_soap wti
+%global allfenceagents fence-agents-apc fence-agents-apc-snmp fence-agents-bladecenter fence-agents-brocade fence-agents-cisco-mds fence-agents-cisco-ucs fence-agents-compute fence-agents-docker fence-agents-drac5 fence-agents-eaton-snmp fence-agents-emerson fence-agents-eps fence-agents-hpblade fence-agents-ibmblade fence-agents-ifmib fence-agents-ilo2 fence-agents-ilo-moonshot fence-agents-ilo-mp fence-agents-ilo-ssh fence-agents-intelmodular fence-agents-ipdu fence-agents-ipmilan fence-agents-mpath fence-agents-kdump fence-agents-rhevm fence-agents-rsa fence-agents-rsb fence-agents-sbd fence-agents-scsi fence-agents-vbox fence-agents-vmware-soap fence-agents-wti
 %ifarch s390x
 %global testagents virsh zvm
 %else
@@ -214,6 +214,20 @@ The fence-agents-compute package contains a fence agent for Nova compute nodes.
 %{_sbindir}/fence_compute
 %{_mandir}/man8/fence_compute.8*
 
+%package docker
+License: GPLv2+ and LGPLv2+
+Group: System Environment/Base
+Summary: Fence agent for Docker
+Requires: pycurl
+Requires: fence-agents-common = %{version}-%{release}
+Obsoletes: fence-agents
+%description docker
+The fence-agents-docker package contains a fence agent for Docker images that are accessed over HTTP.
+%files docker
+%defattr(-,root,root,-)
+%{_sbindir}/fence_docker
+%{_mandir}/man8/fence_docker.8*
+
 %package drac5
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
@@ -241,6 +255,19 @@ The fence-agents-eaton-snmp package contains a fence agent for Eaton network pow
 %defattr(-,root,root,-)
 %{_sbindir}/fence_eaton_snmp
 %{_mandir}/man8/fence_eaton_snmp.8*
+
+%package emerson
+License: GPLv2+ and LGPLv2+
+Group: System Environment/Base
+Summary: Fence agent for Emerson devices (SNMP)
+Requires: fence-agents-common >= %{version}-%{release}
+Obsoletes: fence-agents
+%description emerson
+The fence-agents-emerson package contains a fence agent for Emerson devices that are accessed via the SNMP protocol.
+%files emerson
+%defattr(-,root,root,-)
+%{_sbindir}/fence_emerson
+%{_mandir}/man8/fence_emerson.8*
 
 %package eps
 License: GPLv2+ and LGPLv2+
@@ -313,6 +340,20 @@ The fence-agents-ilo2 package contains a fence agent for HP iLO2 devices that ar
 %{_mandir}/man8/fence_ilo.8*
 %{_mandir}/man8/fence_ilo2.8*
 
+%package ilo-moonshot
+License: GPLv2+ and LGPLv2+
+Group: System Environment/Base
+Summary: Fence agent for HP iLO Moonshot devices
+Requires: telnet openssh-clients
+Requires: fence-agents-common >= %{version}-%{release}
+Obsoletes: fence-agents
+%description ilo-moonshot
+The fence-agents-ilo-moonshot package contains a fence agent for HP iLO Moonshot devices that are accessed via telnet or SSH.
+%files ilo-moonshot
+%defattr(-,root,root,-)
+%{_sbindir}/fence_ilo_moonshot
+%{_mandir}/man8/fence_ilo_moonshot.8*
+
 %package ilo-mp
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
@@ -339,10 +380,10 @@ The fence-agents-ilo-ssh package contains a fence agent for HP iLO devices that 
 %files ilo-ssh
 %defattr(-,root,root,-)
 %{_sbindir}/fence_ilo_ssh
-%{_sbindir}/fence_ilo3_ssh
-%{_sbindir}/fence_ilo4_ssh
 %{_mandir}/man8/fence_ilo_ssh.8*
+%{_sbindir}/fence_ilo3_ssh
 %{_mandir}/man8/fence_ilo3_ssh.8*
+%{_sbindir}/fence_ilo4_ssh
 %{_mandir}/man8/fence_ilo4_ssh.8*
 
 %package intelmodular
@@ -394,6 +435,20 @@ The fence-agents-ipmilan package contains a fence agent for devices with IPMI in
 %{_mandir}/man8/fence_ilo4.8*
 %{_sbindir}/fence_imm
 %{_mandir}/man8/fence_imm.8*
+
+%package mpath
+License: GPLv2+ and LGPLv2+
+Group: System Environment/Base
+Summary: Fence agent for reservations over Device Mapper Multipath
+Requires: fence-agents-common >= %{version}-%{release}
+Requires: device-mapper-multipath
+Obsoletes: fence-agents
+%description mpath
+The fence-agents-mpath package contains fence agent for SCSI persisent reservation over Device Mapper Multipath
+%files mpath
+%defattr(-,root,root,-)
+%{_sbindir}/fence_mpath
+%{_mandir}/man8/fence_mpath.8*
 
 %package kdump
 License: GPLv2+ and LGPLv2+
@@ -455,7 +510,6 @@ The fence-agents-rhevm package contains a fence agent for RHEV-M via REST API
 %{_sbindir}/fence_rhevm
 %{_mandir}/man8/fence_rhevm.8*
 
-%if 0%{?fedora}
 %package rsa
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
@@ -469,7 +523,6 @@ The fence-agents-rsa package contains a fence agent for IBM RSA II devices that 
 %defattr(-,root,root,-)
 %{_sbindir}/fence_rsa
 %{_mandir}/man8/fence_rsa.8*
-%endif
 
 %package rsb
 License: GPLv2+ and LGPLv2+
@@ -501,6 +554,19 @@ The fence-agents-sanbox2 package contains a fence agent for QLogic SANBox2 switc
 %{_mandir}/man8/fence_sanbox2.8*
 %endif
 
+%package sbd
+License: GPLv2+ and LGPLv2+
+Group: System Environment/Base
+Summary: Fence agent for SBD
+Requires: fence-agents-common >= %{version}-%{release}
+Obsoletes: fence-agents
+%description sbd
+The fence-agents-sbd package contains a fence agent for SBD
+%files sbd
+%defattr(-,root,root,-)
+%{_sbindir}/fence_sbd
+%{_mandir}/man8/fence_sbd.8*
+
 %package scsi
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
@@ -513,7 +579,21 @@ The fence-agents-scsi package contains fence agent for SCSI persisent reservatio
 %defattr(-,root,root,-)
 %{_sbindir}/fence_scsi
 %{_datadir}/cluster/fence_scsi_check
+%{_datadir}/cluster/fence_scsi_check_hardreboot
 %{_mandir}/man8/fence_scsi.8*
+
+%package vbox
+License: GPLv2+ and LGPLv2+
+Group: System Environment/Base
+Summary: Fence agent for VirtualBox
+Requires: fence-agents-common >= %{version}-%{release}
+Obsoletes: fence-agents
+%description vbox
+The fence-agents-vbox package contains a fence agent for VirtualBox
+%files vbox
+%defattr(-,root,root,-)
+%{_sbindir}/fence_vbox
+%{_mandir}/man8/fence_vbox.8*
 
 %package virsh
 License: GPLv2+ and LGPLv2+
@@ -569,13 +649,133 @@ Obsoletes: fence-agents
 The fence-agents-zvm package contains a fence agent for z/VM hypervisors
 %files zvm
 %defattr(-,root,root,-)
-%{_sbindir}/fence_zvm
-%{_mandir}/man8/fence_zvm.8*
 %{_sbindir}/fence_zvmip
 %{_mandir}/man8/fence_zvmip.8*
 %endif
 
 %changelog
+* Tue Feb 09 2016 Marek Grac <mgrac@redhat.com> - 4.0.11-27.5
+- fence_cisco_ucs: Change endpoint for 'status' action
+  Resolves: rhb#1303698
+
+* Tue Feb 02 2016 Marek Grac <mgrac@redhat.com> - 4.0.11-27.4
+- fence_cisco_ucs: Change endpoint for 'status' action
+  Resolves: rhb#1303698
+
+* Wed Jan 20 2016 Marek Grac <mgrac@redhat.com> - 4.0.11-30
+- fence_compute: Replace with current implementation
+  Resolves: rhbz#1299577
+
+* Wed Dec 16 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-27.2
+- fence_scsi: Add fence_scsi_check_hardreboot
+  Resolves: rhbz#bz1292071
+
+* Mon Oct 26 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-27
+- fence_brocade: Fix return status in get_power_status
+  Resolves: rhbz#1274431
+
+* Thu Sep 17 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-26
+- fence_ipmilan: Fix -i attribute
+  Resolves: rhbz#1257137
+
+* Mon Sep 14 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-25
+- fence_apc: Support for v6.x
+  Resolves: rhbz#1259319
+
+* Wed Sep 02 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-24
+- fence_ipmilan: Add removed attributes -i & timeout
+  Resolves: rhbz#1257137
+- fence_ipmilan: Do not print password in verbose mode
+  Resolves: rhbz#1241648
+- fence_ilo: Negotiation of TLS1.0 is more automatic
+  Resolves: rhbz#1256908
+
+* Mon Aug 17 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-23
+- fence_scsi: Fix watchdog script broken by more strict 'monitor'
+  Resolves: 1243485
+
+* Wed Aug 12 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-21
+- fence_mpath: Fix unfencing after non-cluster reboot
+  Resolves: 1102727
+- manual pages now describe 'list-status' properly
+
+* Tue Aug 11 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-20
+- fencing: Fix place where --plug + --port-as-ip are tested
+  Resolves: rhbz#1214522
+
+* Mon Aug 10 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-19
+- fencing: do not fail when state is None
+  Resolves: rhbz#1251491
+
+* Wed Aug 05 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-18
+- fence_rsa: Fix login issue
+  Resolves: rhbz#1185329
+- fencing: support for list-status
+  Resolves: rhbz#1250586
+- fencing: Fix support for --port-as-ip
+  Resolves: rhbz#1214522
+
+* Thu Jul 16 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-17
+- fence_scsi: Improve monitoring and add option to force ON
+  Resolves: rhbz#1243485
+
+* Mon Jun 29 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-16
+- fence_compute: Agent cleanup
+  Resolves: rhbz#1214359
+- fence_hpblade: Add support for HP Integrity Superdome
+  Resolves: rhbz#1216997
+- fence_zvmip: Add --missing-as-off and change monitor/status actions
+  Resolves: rhbz#1188750
+- fence_mpath: new fence agent
+  Resolves: rhbz#1102727
+- fencing: Option --port-as-ip
+  Resolves: rhbz#1214522
+
+* Mon Jun 22 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-15
+- fence_zvmip: Connection timeout issues
+  Resolves: rhbz#1188750
+
+* Thu Jun 18 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-14
+- fence_rhevm: Add authentication via cookies
+  Resolves: rhbz#1145769
+- fence_ilo_moonshot: New fence agent
+  Resolves: rhbz#1152917
+- fence_emerson: New fence agent
+  Resolves: rhbz#1171732
+- fence_rsa: New fence agent
+  Resolves: rhbz#1185329
+
+* Wed Jun 17 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-13
+- fence_scsi: Add monitor operation
+  Resolves: rhbz#1213571
+- fence_scsi: Force unfence if any of paths is off
+  Resolves: rhbz#1214919
+- fence_cisco_ucs: Fix https:// prefix with --ssl-(in)secure
+  Resolves: rhbz#1165591
+- fence_kdump: Add monitor operation
+  Resolves: rhbz#1196068
+- fence2rng: Fix problem with quotes
+  Resolves: rhbz#1207982
+
+* Mon Jun 08 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-12
+- New fence agent fence_compute
+  Resolves: rhbz#1214359
+
+* Wed Mar 25 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-11
+- fence_ipmilan: Unset default cipher
+  Resolves: rhbz#1203877
+- fence_ilo2: Add --tls1.0
+  Resolves: rhbz#1199970
+- update scripts so 'make check' is working again
+
+* Mon Jan 05 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-10
+- fence_zvmip: Add fence_zvmip ported to fencing library
+  Resolves: rhbz#1173178
+
+* Mon Dec 01 2014 Marek Grac <mgrac@redhat.com> - 4.0.11-9
+- fence_ilo_ssh: Fix EOL issue, syslog problem and add fence_ilo_[34]_ssh symlink
+  Resolves: rhbz#1121122
+
 * Wed Nov 12 2014 Marek Grac <mgrac@redhat.com> - 4.0.11-8
 - fence_zvm: Add 'monitor' support for fence_zvmip
   Resolves: rhbz#1140921
