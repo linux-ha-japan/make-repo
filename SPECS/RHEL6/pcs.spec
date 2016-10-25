@@ -1,5 +1,5 @@
 Name: pcs		
-Version: 0.9.149
+Version: 0.9.154
 Release: 1%{?dist}
 License: GPLv2
 URL: http://github.com/feist/pcs
@@ -24,7 +24,7 @@ rm -rf $RPM_BUILD_ROOT
 export BUILD_GEMS=false
 make install DESTDIR=$RPM_BUILD_ROOT PYTHON_SITELIB=%{python_sitelib}
 make install_pcsd DESTDIR=$RPM_BUILD_ROOT PYTHON_SITELIB=%{python_sitelib} hdrdir="%{_includedir}" rubyhdrdir="%{_includedir}" includedir="%{_includedir}" initdir="%{_initrddir}"
-chmod 755 $RPM_BUILD_ROOT/%{python_sitelib}/pcs/pcs.py
+chmod 755 $RPM_BUILD_ROOT/%{python_sitelib}/pcs/app.py
 
 %post
 /sbin/chkconfig --add pcsd
