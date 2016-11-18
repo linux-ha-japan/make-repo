@@ -1,5 +1,5 @@
 Name: pcs		
-Version: 0.9.149
+Version: 0.9.154
 Release: 1%{?dist}
 License: GPLv2
 URL: http://github.com/feist/pcs
@@ -47,7 +47,7 @@ pwd
 export BUILD_GEMS=false
 make install DESTDIR=$RPM_BUILD_ROOT PYTHON_SITELIB=%{python_sitelib}
 make install_pcsd DESTDIR=$RPM_BUILD_ROOT PYTHON_SITELIB=%{python_sitelib} hdrdir="%{_includedir}" rubyhdrdir="%{_includedir}" includedir="%{_includedir}"
-chmod 755 $RPM_BUILD_ROOT/%{python_sitelib}/pcs/pcs.py
+chmod 755 $RPM_BUILD_ROOT/%{python_sitelib}/pcs/app.py
 
 # Temporary fix for ruby-2.0.0 and rpam
 #cp $RPM_BUILD_ROOT/usr/lib/pcsd/gemhome/gems/rpam-ruby19-1.2.1/ext/Rpam/rpam_ext.so $RPM_BUILD_ROOT/usr/lib/pcsd/gemhome/gems/rpam-ruby19-1.2.1/lib
