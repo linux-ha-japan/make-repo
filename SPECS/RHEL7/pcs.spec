@@ -1,5 +1,5 @@
 Name: pcs		
-Version: 0.9.154
+Version: 0.9.156
 Release: 1%{?dist}
 License: GPLv2
 URL: http://github.com/feist/pcs
