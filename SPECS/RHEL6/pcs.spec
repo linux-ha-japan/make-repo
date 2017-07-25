@@ -1,5 +1,5 @@
 Name: pcs		
-Version: 0.9.156
+Version: 0.9.159
 Release: 1%{?dist}
 License: GPLv2
 URL: http://github.com/feist/pcs
@@ -52,6 +52,7 @@ fi
 %dir /var/log/pcsd
 /etc/sysconfig/pcsd
 %{_mandir}/man8/pcs.*
+%{_mandir}/man8/pcsd.*
 
 %doc COPYING README
 
