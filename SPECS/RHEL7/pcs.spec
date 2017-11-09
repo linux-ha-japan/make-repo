@@ -1,56 +1,286 @@
-Name: pcs		
-Version: 0.9.159
-Release: 1%{?dist}
+Name: pcs
+Version: 0.9.158
+Release: 6%{?dist}
 License: GPLv2
-URL: http://github.com/feist/pcs
+URL: https://github.com/ClusterLabs/pcs
 Group: System Environment/Base
-#BuildArch: x86_64
-BuildRequires: python2-devel
-Summary: Pacemaker Configuration System	
-Source0: pcs-%{version}.tar.gz
+Summary: Pacemaker Configuration System
+#building only for architectures with pacemaker and corosync available
+ExclusiveArch: i686 x86_64 s390x ppc64le
 
-BuildRequires: ruby >= 2.0.0 ruby-devel rubygems pam-devel git
-BuildRequires: systemd-units rubygem-bundler
+#part after last slash is recognized as filename in look-aside repository
+#desired name is achived by trick with hash anchor
+Source0: %{url}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1: HAM-logo.png
+Source2: pcsd-bundle-config-1
+
+Source11: https://rubygems.org/downloads/backports-3.6.8.gem
+Source12: https://rubygems.org/downloads/multi_json-1.12.1.gem
+Source13: https://rubygems.org/downloads/open4-1.3.4.gem
+Source14: https://rubygems.org/downloads/orderedhash-0.0.6.gem
+Source15: https://rubygems.org/downloads/rack-protection-1.5.3.gem
+Source16: https://rubygems.org/downloads/rack-test-0.6.3.gem
+Source17: https://rubygems.org/downloads/rack-1.6.4.gem
+Source18: https://rubygems.org/downloads/rpam-ruby19-1.2.1.gem
+Source19: https://rubygems.org/downloads/sinatra-contrib-1.4.7.gem
+Source20: https://rubygems.org/downloads/sinatra-1.4.8.gem
+Source21: https://rubygems.org/downloads/tilt-2.0.6.gem
+Source22: https://rubygems.org/downloads/ethon-0.10.1.gem
+Source23: https://rubygems.org/downloads/ffi-1.9.17.gem
+
+Source31: https://github.com/testing-cabal/mock/archive/1.0.1.tar.gz#/mock-1.0.1.tar.gz
+
+Patch0: bz1176018-01-remote-guest-nodes-crashes-fixed.patch
+Patch1: bz1373614-01-return-1-when-pcsd-is-unable-to-bind.patch
+Patch2: bz1386114-01-fix-a-crash-in-adding-a-remote-node.patch
+Patch3: bz1284404-01-web-UI-fix-creating-a-new-cluster.patch
+Patch4: bz1165821-01-pcs-CLI-GUI-should-be-capable-of.patch
+Patch5: bz1176018-02-pcs-pcsd-should-be-able-to-config.patch
+Patch6: bz1386114-02-deal-with-f-corosync_conf-if-create-remote-res.patch
+Patch7: bz1176018-03-don-t-call-remove-guest-node-when-f-is-used.patch
+Patch8: bz1165821-02-pcs-CLI-GUI-should-be-capable-of.patch
+Patch9: bz1447910-01-bundle-resources-are-missing-meta-attributes.patch
+Patch10: bz1433016-02-make-container-type-mandatory-in-bundle-create.patch
+Patch11: bz1284404-02-web-ui-fix-timeout-when-cluster-setup-takes-long.patch
+Patch12: bz1458153-01-give-back-orig.-master-behav.-resource-create.patch
+Patch13: bz1459503-01-OSP-workarounds-not-compatible-wi.patch
+
+Patch100: rhel7.patch
+Patch101: change-cman-to-rhel6-in-messages.patch
+Patch102: show-only-warning-when-crm_mon-xml-is-invalid.patch
+
+# git for patches
+BuildRequires: git
+# python for pcs
+BuildRequires: python
+BuildRequires: python-devel
+BuildRequires: python-setuptools
+BuildRequires: python-pycurl
+# gcc for compiling custom rubygems
+BuildRequires: gcc
+BuildRequires: gcc-c++
+# ruby and gems for pcsd
+BuildRequires: ruby >= 2.0.0
+BuildRequires: rubygems
+BuildRequires: ruby-devel
+# pam devel for compiling rubygem-rpam-ruby19
+BuildRequires: pam-devel
+BuildRequires: rubygem-bundler
+BuildRequires: rubygem-json
+BuildRequires: rubygem-minitest
+#for building rubygem-ffi
+BuildRequires: libffi-devel
+
+# following for UpdateTimestamps sanitization function
+BuildRequires: diffstat
+BuildRequires: systemd-units
+#for tests
+BuildRequires: python-lxml
+BuildRequires: corosync
+BuildRequires: pacemaker
+BuildRequires: pacemaker-cli
+BuildRequires: fence-agents-all
+# pcsd fonts and font management tools
+BuildRequires: fontconfig
+BuildRequires: liberation-sans-fonts
+BuildRequires: overpass-fonts
+
+# python and libraries for pcs, setuptools for pcs entrypoint
+Requires: python
+Requires: python-lxml
+Requires: python-setuptools
+Requires: python-clufter >= 0.59.0
+Requires: python-pycurl
+# ruby and gems for pcsd
+Requires: ruby >= 2.0.0
+Requires: rubygem-json
+# for killall
+Requires: psmisc
+# for working with certificates (validation etc.)
+Requires: openssl
+# cluster stack and related packages
+Requires: corosync
+Requires: pacemaker
+Requires: pacemaker-cli
+# for post, preun and postun macros
 Requires(post): systemd
 Requires(preun): systemd
 Requires(postun): systemd
-Requires: pacemaker-cli corosync ruby >= 2.0.0 pacemaker
-Requires: psmisc initscripts openssl
+# pcsd fonts
+Requires: liberation-sans-fonts
+Requires: overpass-fonts
 
-Provides: bundled(rubygem-backports) = 3.6.4
-Provides: bundled(rubygem-eventmachine) = 1.0.7
-Provides: bundled(rubygem-monkey-lib) = 0.5.4
-Provides: bundled(rubygem-multi_json) = 1.11.1
+Provides: bundled(rubygem-backports) = 3.6.8
+Provides: bundled(rubygem-multi_json) = 1.12.1
 Provides: bundled(rubygem-open4) = 1.3.4
 Provides: bundled(rubygem-orderedhash) = 0.0.6
 Provides: bundled(rubygem-rack) = 1.6.4
 Provides: bundled(rubygem-rack-protection) = 1.5.3
 Provides: bundled(rubygem-rack-test) = 0.6.3
 Provides: bundled(rubygem-rpam-ruby19) = 1.2.1
-Provides: bundled(rubygem-sinatra) = 1.4.6
-Provides: bundled(rubygem-sinatra-contrib) = 1.4.4
-Provides: bundled(rubygem-sinatra-sugar) = 0.5.1
-Provides: bundled(rubygem-tilt) = 1.4.1
+Provides: bundled(rubygem-sinatra) = 1.4.8
+Provides: bundled(rubygem-sinatra-contrib) = 1.4.7
+Provides: bundled(rubygem-tilt) = 2.0.6
+Provides: bundled(rubygem-ethon) = 0.10.1
+Provides: bundled(rubygem-ffi) = 1.9.17
 
 %description
 pcs is a corosync and pacemaker configuration tool.  It permits users to
-easily view, modify and created pacemaker based clusters.
+easily view, modify and create pacemaker based clusters.
 
+%define PCS_PREFIX /usr
 %prep
 %autosetup -p1 -S git
+
+# -- following borrowed from python-simplejon.el5 --
+# Update timestamps on the files touched by a patch, to avoid non-equal
+# .pyc/.pyo files across the multilib peers within a build, where "Level"
+# is the patch prefix option (e.g. -p1)
+UpdateTimestamps() {
+  Level=$1
+  PatchFile=$2
+  # Locate the affected files:
+  for f in $(diffstat $Level -l $PatchFile); do
+    # Set the files to have the same timestamp as that of the patch:
+    touch -r $PatchFile $f
+  done
+}
+UpdateTimestamps -p1 %{PATCH0}
+UpdateTimestamps -p1 %{PATCH1}
+UpdateTimestamps -p1 %{PATCH2}
+UpdateTimestamps -p1 %{PATCH3}
+UpdateTimestamps -p1 %{PATCH4}
+UpdateTimestamps -p1 %{PATCH5}
+UpdateTimestamps -p1 %{PATCH6}
+UpdateTimestamps -p1 %{PATCH7}
+UpdateTimestamps -p1 %{PATCH8}
+UpdateTimestamps -p1 %{PATCH9}
+UpdateTimestamps -p1 %{PATCH10}
+UpdateTimestamps -p1 %{PATCH11}
+UpdateTimestamps -p1 %{PATCH12}
+UpdateTimestamps -p1 %{PATCH13}
+UpdateTimestamps -p1 %{PATCH100}
+UpdateTimestamps -p1 %{PATCH101}
+UpdateTimestamps -p1 %{PATCH102}
+
+cp -f %SOURCE1 pcsd/public/images
+
+mkdir -p pcsd/.bundle
+cp -f %SOURCE2 pcsd/.bundle/config
+
+mkdir -p pcsd/vendor/cache
+#copy ruby gems
+cp -f %SOURCE11 pcsd/vendor/cache
+cp -f %SOURCE12 pcsd/vendor/cache
+cp -f %SOURCE13 pcsd/vendor/cache
+cp -f %SOURCE14 pcsd/vendor/cache
+cp -f %SOURCE15 pcsd/vendor/cache
+cp -f %SOURCE16 pcsd/vendor/cache
+cp -f %SOURCE17 pcsd/vendor/cache
+cp -f %SOURCE18 pcsd/vendor/cache
+cp -f %SOURCE19 pcsd/vendor/cache
+cp -f %SOURCE20 pcsd/vendor/cache
+cp -f %SOURCE21 pcsd/vendor/cache
+cp -f %SOURCE22 pcsd/vendor/cache
+cp -f %SOURCE23 pcsd/vendor/cache
+#ruby gems copied
 
 %build
 
 %install
 rm -rf $RPM_BUILD_ROOT
 pwd
-export BUILD_GEMS=false
-make install DESTDIR=$RPM_BUILD_ROOT PYTHON_SITELIB=%{python_sitelib}
-make install_pcsd DESTDIR=$RPM_BUILD_ROOT PYTHON_SITELIB=%{python_sitelib} hdrdir="%{_includedir}" rubyhdrdir="%{_includedir}" includedir="%{_includedir}"
-chmod 755 $RPM_BUILD_ROOT/%{python_sitelib}/pcs/app.py
+make install \
+  DESTDIR=$RPM_BUILD_ROOT \
+  PYTHON_SITELIB=%{python_sitelib} \
+  PREFIX=%{PCS_PREFIX} \
+  BASH_COMPLETION_DIR=$RPM_BUILD_ROOT/usr/share/bash-completion/completions
+make install_pcsd \
+  DESTDIR=$RPM_BUILD_ROOT \
+  PYTHON_SITELIB=%{python_sitelib} \
+  hdrdir="%{_includedir}" \
+  rubyhdrdir="%{_includedir}" \
+  includedir="%{_includedir}" \
+  PREFIX=%{PCS_PREFIX}
 
-# Temporary fix for ruby-2.0.0 and rpam
-#cp $RPM_BUILD_ROOT/usr/lib/pcsd/gemhome/gems/rpam-ruby19-1.2.1/ext/Rpam/rpam_ext.so $RPM_BUILD_ROOT/usr/lib/pcsd/gemhome/gems/rpam-ruby19-1.2.1/lib
+#after the ruby gem compilation we do not need ruby gems in the cache
+rm -r -v $RPM_BUILD_ROOT%{PCS_PREFIX}/lib/pcsd/vendor/cache
+
+%check
+run_all_tests(){
+  #prepare environment for tests
+  sitelib=$RPM_BUILD_ROOT%{python_sitelib}
+  pcsd_dir=$RPM_BUILD_ROOT%{PCS_PREFIX}/lib/pcsd
+
+  #run pcs tests and remove them, we do not distribute them in rpm
+  #python2-mock package is required but is only in epel so we will install it
+  #manually
+  #we do not have permissions to write anywhere else than $RPM_BUILD_ROOT
+  #so we must install python2-mock there
+  #test fail info:
+  #
+  # FAIL: test_base_create_with_agent_name_including_systemd_instance (pcs.test.cib_resource.test_create.Success)
+  #----------------------------------------------------------------------
+  #Traceback (most recent call last):
+  #  File "/builddir/build/BUILDROOT/pcs-0.9.156-1.el7.x86_64/usr/lib/python2.7/site-packages/pcs/test/cib_resource/test_create.py", line 41, in test_base_create_with_agent_name_including_systemd_instance
+  #    </resources>"""
+  #  File "/builddir/build/BUILDROOT/pcs-0.9.156-1.el7.x86_64/usr/lib/python2.7/site-packages/pcs/test/cib_resource/common.py", line 69, in assert_effect
+  #    self.assert_effect_single(alternative_list[-1], expected_xml, output)
+  #  File "/builddir/build/BUILDROOT/pcs-0.9.156-1.el7.x86_64/usr/lib/python2.7/site-packages/pcs/test/cib_resource/common.py", line 56, in assert_effect_single
+  #    self.assert_pcs_success(command, output)
+  #  File "/builddir/build/BUILDROOT/pcs-0.9.156-1.el7.x86_64/usr/lib/python2.7/site-packages/pcs/test/tools/assertions.py", line 51, in assert_pcs_success
+  #    stdout_start=stdout_start
+  #  File "/builddir/build/BUILDROOT/pcs-0.9.156-1.el7.x86_64/usr/lib/python2.7/site-packages/pcs/test/tools/assertions.py", line 115, in assert_pcs_result
+  #    stdout=stdout
+  #AssertionError: Stdout is not as expected
+  #command: resource create R systemd:lvm2-pvscan@252:2 --no-default-ops --force
+  #diff is (expected is 2nd):
+  #- Warning: Agent 'systemd:lvm2-pvscan@252:2' is not installed or does not provide valid metadata: error: crm_abort: systemd_unit_exec: Triggered fatal assert at systemd.c:676 : systemd_init()
+  #Full stdout:
+  #Warning: Agent 'systemd:lvm2-pvscan@252:2' is not installed or does not provide valid metadata: error: crm_abort: systemd_unit_exec: Triggered fatal assert at systemd.c:676 : systemd_init()
+  #----------------------------------------------------------------------
+  # REASON: crm_resource ends with an error
+  ## cat /etc/redhat-release
+  #Red Hat Enterprise Linux Server release 7.4 Beta (Maipo)
+  ## crm_resource --show-metadata systemd:nonexistent@some:thingxxx
+  #error: crm_abort:  systemd_unit_exec: Triggered fatal assert at systemd.c:676 : systemd_init()
+
+  export PYTHONPATH="${PYTHONPATH}:${sitelib}"
+  easy_install -d ${sitelib} %SOURCE31
+  python ${sitelib}/pcs/test/suite.py -v --vanilla --all-but \
+    pcs.test.test_cluster.ClusterTest.testUIDGID \
+    pcs.test.test_stonith.StonithTest.test_stonith_create_provides_unfencing \
+    pcs.test.cib_resource.test_create.Success.test_base_create_with_agent_name_including_systemd_instance \
+
+  test_result_python=$?
+
+  find ${sitelib}/pcs -name test -type d -print0|xargs -0 rm -r -v --
+  #we installed python2-mock inside $RPM_BUILD_ROOT and now we need to remove
+  #it because it does not belong into pcs package
+  #easy_install does not provide uninstall and pip is not an option (is in
+  #epel) so it must be cleaned manually
+  rm -v ${sitelib}/easy-install.pth
+  rm -v ${sitelib}/mock-1.0.1-py2.7.egg
+  rm -v ${sitelib}/site.py
+  rm -v ${sitelib}/site.pyc
+
+
+  #run pcsd tests and remove them
+  GEM_HOME=${pcsd_dir}/vendor/bundle/ruby ruby \
+    -I${pcsd_dir} \
+    -I${pcsd_dir}/test \
+    ${pcsd_dir}/test/test_all_suite.rb
+  test_result_ruby=$?
+  #remove tests after use here to be symmetrical with pcs tests
+  rm -r -v ${pcsd_dir}/test
+
+  if [ $test_result_python -ne 0 ]; then
+    return $test_result_python
+  fi
+  return $test_result_ruby
+}
+
+run_all_tests
 
 %post
 %systemd_post pcsd.service
@@ -62,25 +292,226 @@ chmod 755 $RPM_BUILD_ROOT/%{python_sitelib}/pcs/app.py
 %systemd_postun_with_restart pcsd.service
 
 %files
-%defattr(-,root,root,-)
 %{python_sitelib}/pcs
 %{python_sitelib}/pcs-%{version}-py2.*.egg-info
 /usr/sbin/pcs
 /usr/lib/pcsd/*
+/usr/lib/pcsd/.bundle/config
 /usr/lib/systemd/system/pcsd.service
+/usr/share/bash-completion/completions/pcs
 /var/lib/pcsd
 /etc/pam.d/pcsd
-/etc/bash_completion.d/pcs
 /etc/logrotate.d/pcsd
 %dir /var/log/pcsd
-/etc/sysconfig/pcsd
+%config(noreplace) /etc/sysconfig/pcsd
+%ghost %config(noreplace) /var/lib/pcsd/cfgsync_ctl
+%ghost %config(noreplace) /var/lib/pcsd/pcsd.cookiesecret
+%ghost %config(noreplace) /var/lib/pcsd/pcsd.crt
+%ghost %config(noreplace) /var/lib/pcsd/pcsd.key
+%ghost %config(noreplace) /var/lib/pcsd/pcs_settings.conf
+%ghost %config(noreplace) /var/lib/pcsd/pcs_users.conf
+%ghost %config(noreplace) /var/lib/pcsd/tokens
 %{_mandir}/man8/pcs.*
 %{_mandir}/man8/pcsd.*
 %exclude /usr/lib/pcsd/*.debian
+%exclude /usr/lib/pcsd/pcsd.service
+%exclude /usr/lib/pcsd/pcsd.conf
+%exclude %{python_sitelib}/pcs/bash_completion
+%exclude %{python_sitelib}/pcs/pcs.8
+%exclude %{python_sitelib}/pcs/pcs
 
-%doc COPYING README
+%doc COPYING
+%doc README
+%doc CHANGELOG.md
 
 %changelog
+* Thu Jun 15 2017 Ivan Devat <idevat@redhat.com> - 0.9.158-6
+- It is now possible to disable, enable, unmanage and manage bundle resources and set their meta attributes
+- Fixed timeout when cluster setup takes long time in web UI
+- It is now mandatory to specify container type in the "resource bundle create" command
+- Resolves: rhbz#1447910 rhbz#1284404
+
+* Thu Jun 08 2017 Ivan Devat <idevat@redhat.com> - 0.9.158-5
+- `pcs cluster setup` uses existing pacemaker authkey if it exists
+- `pcs resource create` shows only warning when case of remote node is detected
+- Resolves: rhbz#1459503
+
+* Tue Jun 06 2017 Ivan Devat <idevat@redhat.com> - 0.9.158-4
+- Added support for enable and disable in bundles
+- New clusters are created with corosync encryption disabled by default
+- Flag `--master` is backward compatible in `pcs resource create`
+- Resolves: rhbz#1165821 rhbz#1433016 rhbz#1458153
+
+* Wed May 31 2017 Ivan Devat <idevat@redhat.com> - 0.9.158-3
+- Added option to create not hardened cluster with the `pcs cluster setup` command using the `--no-hardened` flag
+- Added option to create not hardened cluster from web UI
+- Fixed a crash in the `pcs cluster node add-remote` command when an id conflict occurs
+- Fixed creating a new cluster from the web UI
+- `pcs cluster node add-guest` now works with the flag `--skipp-offline`
+- `pcs cluster node remove-guest` can be run again when the guest node was unreachable first time
+- Fixed "Error: Unable to read /etc/corosync/corosync.conf" when running `pcs resource create`([rhbz#1386114])
+- Binary data are stored in corosync authkey
+- Resolves: rhbz#1284404 rhbz#1373614 rhbz#1165821 rhbz#1176018 rhbz#1386114
+
+* Fri May 26 2017 Tomas Jelinek <tojeline@redhat.com> - 0.9.158-2
+- Fixed crash of the `pcs cluster setup` command when the `--force` flag was used
+- Fixed crash of the `pcs cluster destroy --all` command when the cluster was not running
+- Fixed crash of the `pcs config restore` command when restoring pacemaker authkey
+- Fixed "Error: unable to get cib" when adding a node to a stopped cluster
+- Resolves: rhbz#1176018
+
+* Tue May 23 2017 Ivan Devat <idevat@redhat.com> - 0.9.158-1
+- Rebased to latest upstream sources (see CHANGELOG.md)
+- Resolves: rhbz#1447702 rhbz#1176018 rhbz#1433016 rhbz#1303969 rhbz#1386114 rhbz#1386512 rhbz#1390609 rhbz#1165821 rhbz#1315992 rhbz#1373614 rhbz#1422667 rhbz#1254984
+
+* Mon Apr 10 2017 Ivan Devat <idevat@redhat.com> - 0.9.157-1
+- Rebased to latest upstream sources (see CHANGELOG.md)
+- Resolves: rhbz#1362493 rhbz#1315627 rhbz#1378742 rhbz#1334429 rhbz#1402374 rhbz#1389941 rhbz#1303969 rhbz#1415080 rhbz#1328882 rhbz#1434972 rhbz#1413958
+
+* Tue Feb 28 2017 Ivan Devat <idevat@redhat.com> - 0.9.156-2
+- Added ppc64le architecture
+- Resolves: rhbz#1402573
+
+* Fri Feb 10 2017 Ivan Devat <idevat@redhat.com> - 0.9.156-1
+- Rebased to latest upstream sources (see CHANGELOG.md)
+- Resolves: rhbz#1409821 rhbz#1404233 rhbz#1408476 rhbz#1262001 rhbz#1389443 rhbz#1389941 rhbz#1315992 rhbz#1261116 rhbz#1389501 rhbz#1404229 rhbz#1284404 rhbz#1339355 rhbz#1347335 rhbz#1344712 rhbz#1395226 rhbz#1382004 rhbz#1378107 rhbz#1398562 rhbz#1402475 rhbz#1382597 rhbz#1389453 rhbz#1390071 rhbz#1390066 rhbz#1387670 rhbz#1292858 rhbz#1396462 rhbz#1419903 rhbz#1419661
+
+* Tue Sep 20 2016 Ivan Devat <idevat@redhat.com> - 0.9.152-10
+- Fixed error when stopping qdevice if is not running
+- Fixed removing qdevice from a cluster
+- Fixed documentation regarding booth
+- Fixed return code when no matching ticket constraint found during remove
+- Resolves: rhbz#1158805 rhbz#1305049
+
+* Wed Sep 14 2016 Ivan Devat <idevat@redhat.com> - 0.9.152-9
+- Added warning when stopping/destroying qdevice instance which is being used
+- Fiexed removing qdevice from a cluster which uses sbd
+- Fixed re-running "pcs cluster node add" if it failed due to qdevice
+- Fixed documentation regarding booth
+- Added warning when using unknown booth ticket option
+- Added constraint ticket remove command
+- Fixed return code and message when displaying node utilization for nonexistent node
+- Fixed setting utilization attributes in web UI
+- Fixed support for node utilization on remote node
+- Fixed updating of selected group when displaying new resource dialog
+- Fixed group list when managing cluster running older pcs in web UI
+- Fixed displaying unmanaged status for resources for older pcs in web UI
+- Fixed clone/master/unclone group/ungroup buttons for older pcs in web UI
+- Fixed node standby/unstandby for older pcs in web UI
+- Resolves: rhbz#1158805 rhbz#1308514 rhbz#1305049 rhbz#1158500 rhbz#1231858
+
+* Wed Aug 31 2016 Ivan Devat <idevat@redhat.com> - 0.9.152-8
+- Fixed error message in node maintenance/unmaintenance commands
+- Fixed missing line at the end of booth config
+- Fixed documentation regarding booth
+- Fixed remove multiple booth resources with "--force" flag
+- Fixed cleanup of ip resource if it fails to create booth resource
+- Added bash completion for booth
+- Fixed display full booth configuration
+- Added ability to display booth config from remote node
+- Added support for ticket options during adding booth ticket
+- Fixed adding node to cluster when booth is not installed
+- Added restart command for booth
+- Fixed check if auto_tie_breaker is required when enabling sbd
+- Improved way of displaying status of unmanaged primitive resources in web UI
+- Resolves: rhbz#1247088 rhbz#1308514 rhbz#1164402 rhbz#1264360
+
+* Fri Aug 19 2016 Ivan Devat <idevat@redhat.com> - 0.9.152-7
+- Added possibility to hide inactive resources in "pcs resource show" command
+- Fixed exceptions handling when waiting for response from user in command line
+- Fixed nonexisting resource detection in pcsd
+- Fixed SBD_WATCHDOG_TIMEOUT option value validation
+- Removed possibility to change SBD_PACEMAKER
+- Fixed exception when disabling service on systemd systems
+- Added automatic auto_tie_breaker quorum option set whenever it is needed for SBD to work
+- Fixed setting sbd watchdog in config
+- Fixed error handling when upgrading cib schema
+- Improved consistency of syntax 'pcs alert recipient add' command
+- Resolves: rhbz#1298585 rhbz#1354498 rhbz#1346852 rhbz#1164402 rhbz#1315371 rhbz#1366307
+
+* Fri Aug 05 2016 Ivan Devat <idevat@redhat.com> - 0.9.152-6
+- Fixed documentation regarding clufter
+- Added possibility to change order of resources in a group in web UI
+- Added support for unmanaged resources in web UI
+- Added support for booth (cluster ticket manager)
+- Resolves: rhbz#1357945 rhbz#1281391 rhbz#1264360 rhbz#1308514
+
+* Thu Jul 28 2016 Ivan Devat <idevat@redhat.com> - 0.9.152-5
+- Fixed traceback when stopping pcsd shortly after start
+- Fixed removing a dead node from a cluster
+- Added support for clufter's 'dist' parameter
+- Fixed filtering by property name in "pcs property show"
+- Fixed an error in web UI when removing resources takes a long time
+- Fixed occasional missing optional arguments of resources in web UI
+- Improved help for alerts
+- Fixed recreating a remote node resource
+- Fixed exceptions when authenticating cluster nodes
+- Fixed permissions for bash completion file
+- Resolves: rhbz#1348579 rhbz#1225423 rhbz#1357945 rhbz#1302010 rhbz#1301993 rhbz#1346852 rhbz#1231858 rhbz#1315371 rhbz#1303136 rhbz#1329472 rhbz#1359154 rhbz#1349465
+
+* Fri Jul 15 2016 Ivan Devat <idevat@redhat.com> - 0.9.152-4
+- Added colocation constraint support in web UI
+- Fixed displaying cluster config when cib is provided as a file
+- Removed side effect on /etc/hosts during build
+- Recipient id is used as identifier in alarms
+- Improved quorum device commands syntax
+- Fixed pcs client for running on a remote node
+- Resolves: rhbz#1281364 rhbz#1269242 rhbz#1353607 rhbz#1315371 rhbz#1158805 rhbz#1289418
+
+* Fri Jul 01 2016 Ivan Devat <idevat@redhat.com> - 0.9.152-3
+- Added support for pacemaker alerts
+- Added support for qdevice/qnetd provided by corosync
+- Fixed sbd calls on python3
+- Fixed bad request when resource removal takes longer than pcs expects
+- Added support for set expected votes on a live cluster
+- Added a wrapper for holding SELinux context when pcsd is started by systemd
+- Resolves: rhbz#1315371 rhbz#1158805 rhbz#1164402 rhbz#1346852 rhbz#1327739 rhbz#1348579 rhbz#1349465
+
+* Wed Jun 22 2016 Ivan Devat <idevat@redhat.com> - 0.9.152-2
+- Specified achitectures matching with pacemaker and corosync
+- Resolves: rhbz#1299847
+
+* Tue Jun 21 2016 Ivan Devat <idevat@redhat.com> - 0.9.152-1
+- Rebased to latest upstream sources
+- Added support for sbd configuration
+- Added support for constraint tickets in web UI
+- Added warning to pcs quorum unblock command
+- Fixes in manpage and built-in help
+- Config files marked as config
+- Resolves: rhbz#1299847 rhbz#1164402 rhbz#1305049 rhbz#1264566 rhbz#1225946 rhbz#1231858 rhbz#1328066 rhbz#1341114
+
+* Fri Jun 03 2016 Ivan Devat <idevat@redhat.com> - 0.9.151-2
+- Added missing requirements for python-setuptools
+- Resolves: rhbz#1299847
+
+* Tue May 31 2016 Ivan Devat <idevat@redhat.com> - 0.9.151-1
+- Rebased to latest upstream sources
+- Added support for utilization attributes
+- Optimized pcs status command
+- Fixes in manpage and built-in help
+- Improved resource cleanups
+- Added --wait support for cluster start and node standby commands
+- Improved resource and fence agent options in web UI
+- Added ability to put a node into maintenance mode
+- Fixed adding acl permission when targed id does not exists
+- Fixed deleting resource when referenced in acl
+- Improved pcsd launch script
+- Added automatically setting provides=unfencing meta attribute for stonith device
+- Improved Cluster Properties page in web UI
+- Fixed page update after adding group in web UI
+- Fixed deleting group (clones) when managing older cluster in web UI
+- Fixed stonith update command when fence agents fails to get metadata
+- Added support for putting Pacemaker Remote nodes into standby
+- Added support for omission stopped resources in status command
+- Added login input sanitization in web UI
+- Added config settings for SSL options and ciphers
+- Improved resource update command to inform user about missused op settings
+- Spec file fixes
+- Added support for constraint tickets from command line
+- Fixed CVE-2016-0720 pcs: Cross-Site Request Forgery in web UI
+- Fixed CVE-2016-0721 pcs: cookies are not invalidated upon logout
+- Resolves: rhbz#1299847 rhbz#1158500 rhbz#1207405 rhbz#1219581 rhbz#1225946 rhbz#1220512 rhbz#1229822 rhbz#1231858 rhbz#1247088 rhbz#1248990 rhbz#1249085 rhbz#1252050 rhbz#1262773 rhbz#1281371 rhbz#1283562 rhbz#1286664 rhbz#1287320 rhbz#1290512 rhbz#1298585 rhbz#1305786 rhbz#1315652 rhbz#1321021 rhbz#1315743 rhbz#1315357 rhbz#1305049 rhbz#1335779 rhbz#1330884
+
 * Wed Oct 21 2015 Tomas Jelinek <tojeline@redhat.com> - 0.9.143-15
 - Fixed setting cluster properties in web UI
 - Resolves: rhbz#1272412
