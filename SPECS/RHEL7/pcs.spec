@@ -1,6 +1,6 @@
 Name: pcs
-Version: 0.9.158
-Release: 6%{?dist}
+Version: 0.9.161
+Release: 1%{?dist}
 License: GPLv2
 URL: https://github.com/ClusterLabs/pcs
 Group: System Environment/Base
@@ -10,44 +10,7 @@ ExclusiveArch: i686 x86_64 s390x ppc64le
 
 #part after last slash is recognized as filename in look-aside repository
 #desired name is achived by trick with hash anchor
-Source0: %{url}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1: HAM-logo.png
-Source2: pcsd-bundle-config-1
-
-Source11: https://rubygems.org/downloads/backports-3.6.8.gem
-Source12: https://rubygems.org/downloads/multi_json-1.12.1.gem
-Source13: https://rubygems.org/downloads/open4-1.3.4.gem
-Source14: https://rubygems.org/downloads/orderedhash-0.0.6.gem
-Source15: https://rubygems.org/downloads/rack-protection-1.5.3.gem
-Source16: https://rubygems.org/downloads/rack-test-0.6.3.gem
-Source17: https://rubygems.org/downloads/rack-1.6.4.gem
-Source18: https://rubygems.org/downloads/rpam-ruby19-1.2.1.gem
-Source19: https://rubygems.org/downloads/sinatra-contrib-1.4.7.gem
-Source20: https://rubygems.org/downloads/sinatra-1.4.8.gem
-Source21: https://rubygems.org/downloads/tilt-2.0.6.gem
-Source22: https://rubygems.org/downloads/ethon-0.10.1.gem
-Source23: https://rubygems.org/downloads/ffi-1.9.17.gem
-
-Source31: https://github.com/testing-cabal/mock/archive/1.0.1.tar.gz#/mock-1.0.1.tar.gz
-
-Patch0: bz1176018-01-remote-guest-nodes-crashes-fixed.patch
-Patch1: bz1373614-01-return-1-when-pcsd-is-unable-to-bind.patch
-Patch2: bz1386114-01-fix-a-crash-in-adding-a-remote-node.patch
-Patch3: bz1284404-01-web-UI-fix-creating-a-new-cluster.patch
-Patch4: bz1165821-01-pcs-CLI-GUI-should-be-capable-of.patch
-Patch5: bz1176018-02-pcs-pcsd-should-be-able-to-config.patch
-Patch6: bz1386114-02-deal-with-f-corosync_conf-if-create-remote-res.patch
-Patch7: bz1176018-03-don-t-call-remove-guest-node-when-f-is-used.patch
-Patch8: bz1165821-02-pcs-CLI-GUI-should-be-capable-of.patch
-Patch9: bz1447910-01-bundle-resources-are-missing-meta-attributes.patch
-Patch10: bz1433016-02-make-container-type-mandatory-in-bundle-create.patch
-Patch11: bz1284404-02-web-ui-fix-timeout-when-cluster-setup-takes-long.patch
-Patch12: bz1458153-01-give-back-orig.-master-behav.-resource-create.patch
-Patch13: bz1459503-01-OSP-workarounds-not-compatible-wi.patch
-
-Patch100: rhel7.patch
-Patch101: change-cman-to-rhel6-in-messages.patch
-Patch102: show-only-warning-when-crm_mon-xml-is-invalid.patch
+Source0: pcs-%{version}.tar.gz
 
 # git for patches
 BuildRequires: git
@@ -60,26 +23,10 @@ BuildRequires: python-pycurl
 BuildRequires: gcc
 BuildRequires: gcc-c++
 # ruby and gems for pcsd
-BuildRequires: ruby >= 2.0.0
-BuildRequires: rubygems
 BuildRequires: ruby-devel
-# pam devel for compiling rubygem-rpam-ruby19
-BuildRequires: pam-devel
-BuildRequires: rubygem-bundler
-BuildRequires: rubygem-json
-BuildRequires: rubygem-minitest
-#for building rubygem-ffi
-BuildRequires: libffi-devel
 
 # following for UpdateTimestamps sanitization function
 BuildRequires: diffstat
-BuildRequires: systemd-units
-#for tests
-BuildRequires: python-lxml
-BuildRequires: corosync
-BuildRequires: pacemaker
-BuildRequires: pacemaker-cli
-BuildRequires: fence-agents-all
 # pcsd fonts and font management tools
 BuildRequires: fontconfig
 BuildRequires: liberation-sans-fonts
@@ -89,11 +36,6 @@ BuildRequires: overpass-fonts
 Requires: python
 Requires: python-lxml
 Requires: python-setuptools
-Requires: python-clufter >= 0.59.0
-Requires: python-pycurl
-# ruby and gems for pcsd
-Requires: ruby >= 2.0.0
-Requires: rubygem-json
 # for killall
 Requires: psmisc
 # for working with certificates (validation etc.)
@@ -109,20 +51,6 @@ Requires(postun): systemd
 # pcsd fonts
 Requires: liberation-sans-fonts
 Requires: overpass-fonts
-
-Provides: bundled(rubygem-backports) = 3.6.8
-Provides: bundled(rubygem-multi_json) = 1.12.1
-Provides: bundled(rubygem-open4) = 1.3.4
-Provides: bundled(rubygem-orderedhash) = 0.0.6
-Provides: bundled(rubygem-rack) = 1.6.4
-Provides: bundled(rubygem-rack-protection) = 1.5.3
-Provides: bundled(rubygem-rack-test) = 0.6.3
-Provides: bundled(rubygem-rpam-ruby19) = 1.2.1
-Provides: bundled(rubygem-sinatra) = 1.4.8
-Provides: bundled(rubygem-sinatra-contrib) = 1.4.7
-Provides: bundled(rubygem-tilt) = 2.0.6
-Provides: bundled(rubygem-ethon) = 0.10.1
-Provides: bundled(rubygem-ffi) = 1.9.17
 
 %description
 pcs is a corosync and pacemaker configuration tool.  It permits users to
@@ -145,45 +73,6 @@ UpdateTimestamps() {
     touch -r $PatchFile $f
   done
 }
-UpdateTimestamps -p1 %{PATCH0}
-UpdateTimestamps -p1 %{PATCH1}
-UpdateTimestamps -p1 %{PATCH2}
-UpdateTimestamps -p1 %{PATCH3}
-UpdateTimestamps -p1 %{PATCH4}
-UpdateTimestamps -p1 %{PATCH5}
-UpdateTimestamps -p1 %{PATCH6}
-UpdateTimestamps -p1 %{PATCH7}
-UpdateTimestamps -p1 %{PATCH8}
-UpdateTimestamps -p1 %{PATCH9}
-UpdateTimestamps -p1 %{PATCH10}
-UpdateTimestamps -p1 %{PATCH11}
-UpdateTimestamps -p1 %{PATCH12}
-UpdateTimestamps -p1 %{PATCH13}
-UpdateTimestamps -p1 %{PATCH100}
-UpdateTimestamps -p1 %{PATCH101}
-UpdateTimestamps -p1 %{PATCH102}
-
-cp -f %SOURCE1 pcsd/public/images
-
-mkdir -p pcsd/.bundle
-cp -f %SOURCE2 pcsd/.bundle/config
-
-mkdir -p pcsd/vendor/cache
-#copy ruby gems
-cp -f %SOURCE11 pcsd/vendor/cache
-cp -f %SOURCE12 pcsd/vendor/cache
-cp -f %SOURCE13 pcsd/vendor/cache
-cp -f %SOURCE14 pcsd/vendor/cache
-cp -f %SOURCE15 pcsd/vendor/cache
-cp -f %SOURCE16 pcsd/vendor/cache
-cp -f %SOURCE17 pcsd/vendor/cache
-cp -f %SOURCE18 pcsd/vendor/cache
-cp -f %SOURCE19 pcsd/vendor/cache
-cp -f %SOURCE20 pcsd/vendor/cache
-cp -f %SOURCE21 pcsd/vendor/cache
-cp -f %SOURCE22 pcsd/vendor/cache
-cp -f %SOURCE23 pcsd/vendor/cache
-#ruby gems copied
 
 %build
 
@@ -194,90 +83,25 @@ make install \
   DESTDIR=$RPM_BUILD_ROOT \
   PYTHON_SITELIB=%{python_sitelib} \
   PREFIX=%{PCS_PREFIX} \
+  SYSTEMCTL_OVERRIDE=true \
+  BUILD_GEMS=false \
   BASH_COMPLETION_DIR=$RPM_BUILD_ROOT/usr/share/bash-completion/completions
 make install_pcsd \
   DESTDIR=$RPM_BUILD_ROOT \
   PYTHON_SITELIB=%{python_sitelib} \
+  SYSTEMCTL_OVERRIDE=true \
+  BUILD_GEMS=false \
   hdrdir="%{_includedir}" \
   rubyhdrdir="%{_includedir}" \
   includedir="%{_includedir}" \
   PREFIX=%{PCS_PREFIX}
 
-#after the ruby gem compilation we do not need ruby gems in the cache
-rm -r -v $RPM_BUILD_ROOT%{PCS_PREFIX}/lib/pcsd/vendor/cache
-
 %check
 run_all_tests(){
   #prepare environment for tests
   sitelib=$RPM_BUILD_ROOT%{python_sitelib}
-  pcsd_dir=$RPM_BUILD_ROOT%{PCS_PREFIX}/lib/pcsd
-
-  #run pcs tests and remove them, we do not distribute them in rpm
-  #python2-mock package is required but is only in epel so we will install it
-  #manually
-  #we do not have permissions to write anywhere else than $RPM_BUILD_ROOT
-  #so we must install python2-mock there
-  #test fail info:
-  #
-  # FAIL: test_base_create_with_agent_name_including_systemd_instance (pcs.test.cib_resource.test_create.Success)
-  #----------------------------------------------------------------------
-  #Traceback (most recent call last):
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.156-1.el7.x86_64/usr/lib/python2.7/site-packages/pcs/test/cib_resource/test_create.py", line 41, in test_base_create_with_agent_name_including_systemd_instance
-  #    </resources>"""
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.156-1.el7.x86_64/usr/lib/python2.7/site-packages/pcs/test/cib_resource/common.py", line 69, in assert_effect
-  #    self.assert_effect_single(alternative_list[-1], expected_xml, output)
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.156-1.el7.x86_64/usr/lib/python2.7/site-packages/pcs/test/cib_resource/common.py", line 56, in assert_effect_single
-  #    self.assert_pcs_success(command, output)
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.156-1.el7.x86_64/usr/lib/python2.7/site-packages/pcs/test/tools/assertions.py", line 51, in assert_pcs_success
-  #    stdout_start=stdout_start
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.156-1.el7.x86_64/usr/lib/python2.7/site-packages/pcs/test/tools/assertions.py", line 115, in assert_pcs_result
-  #    stdout=stdout
-  #AssertionError: Stdout is not as expected
-  #command: resource create R systemd:lvm2-pvscan@252:2 --no-default-ops --force
-  #diff is (expected is 2nd):
-  #- Warning: Agent 'systemd:lvm2-pvscan@252:2' is not installed or does not provide valid metadata: error: crm_abort: systemd_unit_exec: Triggered fatal assert at systemd.c:676 : systemd_init()
-  #Full stdout:
-  #Warning: Agent 'systemd:lvm2-pvscan@252:2' is not installed or does not provide valid metadata: error: crm_abort: systemd_unit_exec: Triggered fatal assert at systemd.c:676 : systemd_init()
-  #----------------------------------------------------------------------
-  # REASON: crm_resource ends with an error
-  ## cat /etc/redhat-release
-  #Red Hat Enterprise Linux Server release 7.4 Beta (Maipo)
-  ## crm_resource --show-metadata systemd:nonexistent@some:thingxxx
-  #error: crm_abort:  systemd_unit_exec: Triggered fatal assert at systemd.c:676 : systemd_init()
-
-  export PYTHONPATH="${PYTHONPATH}:${sitelib}"
-  easy_install -d ${sitelib} %SOURCE31
-  python ${sitelib}/pcs/test/suite.py -v --vanilla --all-but \
-    pcs.test.test_cluster.ClusterTest.testUIDGID \
-    pcs.test.test_stonith.StonithTest.test_stonith_create_provides_unfencing \
-    pcs.test.cib_resource.test_create.Success.test_base_create_with_agent_name_including_systemd_instance \
-
-  test_result_python=$?
 
   find ${sitelib}/pcs -name test -type d -print0|xargs -0 rm -r -v --
-  #we installed python2-mock inside $RPM_BUILD_ROOT and now we need to remove
-  #it because it does not belong into pcs package
-  #easy_install does not provide uninstall and pip is not an option (is in
-  #epel) so it must be cleaned manually
-  rm -v ${sitelib}/easy-install.pth
-  rm -v ${sitelib}/mock-1.0.1-py2.7.egg
-  rm -v ${sitelib}/site.py
-  rm -v ${sitelib}/site.pyc
-
-
-  #run pcsd tests and remove them
-  GEM_HOME=${pcsd_dir}/vendor/bundle/ruby ruby \
-    -I${pcsd_dir} \
-    -I${pcsd_dir}/test \
-    ${pcsd_dir}/test/test_all_suite.rb
-  test_result_ruby=$?
-  #remove tests after use here to be symmetrical with pcs tests
-  rm -r -v ${pcsd_dir}/test
-
-  if [ $test_result_python -ne 0 ]; then
-    return $test_result_python
-  fi
-  return $test_result_ruby
 }
 
 run_all_tests
@@ -296,7 +120,6 @@ run_all_tests
 %{python_sitelib}/pcs-%{version}-py2.*.egg-info
 /usr/sbin/pcs
 /usr/lib/pcsd/*
-/usr/lib/pcsd/.bundle/config
 /usr/lib/systemd/system/pcsd.service
 /usr/share/bash-completion/completions/pcs
 /var/lib/pcsd
@@ -321,7 +144,7 @@ run_all_tests
 %exclude %{python_sitelib}/pcs/pcs
 
 %doc COPYING
-%doc README
+%doc README.md
 %doc CHANGELOG.md
 
 %changelog
