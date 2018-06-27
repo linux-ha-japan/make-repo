@@ -15,150 +15,15 @@
 
 Name: fence-agents
 Summary: Fence Agents for Red Hat Cluster
-Version: 4.0.11
-Release: 86%{?alphatag:.%{alphatag}}%{?dist}.2
+Version: 4.2.1
+Release: 1%{?alphatag:.%{alphatag}}%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
 URL: https://github.com/ClusterLabs/fence-agents
-Source0: https://fedorahosted.org/releases/f/e/fence-agents/%{name}-%{version}.tar.xz
-Patch0: bz1072564-1-add_ssl_secure_and_ssl_insecure.patch
-Patch1: bz1072564-2-add_ssl_secure_and_ssl_insecure.patch
-Patch2: backward-rename_fence_scsi_check_to_pl.patch
-Patch3: bz1121122-1-fence_ilo_ssh.patch
-Patch4: bz1140921-1-fence_zvm.patch
-Patch5: bz1111597-1-fence_rsb.patch
-Patch6: bz1148762-1-fence_wti_eol.patch
-Patch7: bz1153059-1-fence_vmware_soap-fail_usage.patch
-Patch8: bz1111599-1-fence_cisco_and_soap_logout.patch
-Patch9: bz1162092-1-fix_ssl_secure.patch
-Patch10: bz1140921-2-fence_zvm.patch
-Patch11: bz1140921-3-fence_zvm.patch
-Patch12: bz1121122-2-broken_syslog.patch
-Patch13: bz1121122-3-eol_changed.patch
-Patch14: bz1121122-3.5-delay_test.patch
-Patch15: bz1121122-4-symlink_ilo34_ssh.patch
-Patch16: bz1121122-5-symlink_ilo34_ssh.patch
-Patch17: bz1173178-1-rewrite_fence_zvmip.patch
-Patch18: tests-01.patch
-Patch19: tests-02.patch
-Patch20: bz1199970-fence_ilo_support_tls10.patch
-Patch21: bz1203877-fence_ipmilan-default_cipher.patch
-Patch22: bz1214359-1-fence_compute.patch
-Patch23: bz1214359-2-fence_compute.patch
-Patch24: bz1214359-3-fence_compute.patch
-Patch25: bz1214359-4-fence_compute.patch
-Patch26: test-01-fix_xml_metadata.patch
-Patch27: bz1213571-fence_scsi-add_monitor.patch
-Patch28: bz1214919-fence_scsi-already_on.patch
-Patch29: bz1145769-fence_rhevm-cookies_auth.patch
-Patch30: bz1165591-fence_cisco_ucs-https.patch
-Patch31: bz1196068-fence_kdump-add_monitor.patch
-Patch32: bz1196068-2-fence_kdump-add_monitor.patch
-Patch33: bz1196068-3-fence_kdump-add_monitor.patch
-Patch34: bz1196068-4-fence_kdump-add_monitor.patch
-Patch35: bz1207982-fence2rng-quotes.patch
-Patch36: bz1171732-1-fence_emerson.patch
-Patch37: bz1171732-2-fence_emerson.patch
-Patch38: bz1171732-3-fence_emerson.patch
-Patch39: bz1188750-0-fence_zvmip-improve_usage_of_resources.patch
-Patch40: bz1188750-fence_zvmip-improve_usage_of_resources.patch
-Patch41: bz1214359-5-fence_compute.patch
-Patch42: bz1214359-6-fence_compute.patch
-Patch43: bz1216997-support_for_hp_superdome.patch
-Patch44: bz1102727-fence_mpath.patch
-Patch45: bz1102727-2-duplicate_getopt.patch
-Patch46: bz1214359-7-fence_compute_xml_test.patch
-Patch47: bz1214522-port_as_ip.patch
-Patch48: bz1102727-2-fence_mpath.patch
-Patch49: bz1243485-1-fence_scsi-force-on.patch
-Patch50: bz1243485-2-fence_scsi-monitor.patch
-Patch51: bz1250586-list_status.patch
-Patch52: bz1214522-2-port_as_ip.patch
-Patch53: bz1214522-3-port_as_ip.patch
-Patch54: bz1185329-fence_rsa.patch
-Patch55: bz1251491-none_as_state.patch
-Patch56: bz1214522-4-port_as_ip.patch
-Patch57: bz1214522-5-port_as_ip.patch
-Patch58: bz1102727-3-fence_mpath.patch
-Patch59: bz1250586-2-list_status.patch
-Patch60: bz1243485-3-fence_scsi_check.patch
-Patch61: bz1241648-fence_ipmilan_password_verbose.patch
-Patch62: bz1257137-1-fence_ipmilan_regression.patch
-Patch63: bz1257137-2-fence_ipmilan_regression.patch
-Patch64: bz1256908-fence_ilo-tls_negotiation.patch
-Patch65: bz1259319-fence_apc_v6.patch
-Patch66: bz1257137-3-fence_ipmilan_regression.patch
-Patch67: bz1274432-fence_brocade-fix_incorrect_return.patch
-Patch68: bz1265426-1-fence_scsi_hard.patch
-Patch69: bz1265426-2-fence_scsi_hard.patch
-Patch70: bz1265426-3-fence_scsi_hard.patch
-Patch71: bz1265426-4-fence_scsi_hard.patch
-Patch72: bz1283084-fence_compute.patch
-Patch73: bz1298430-fence_cisco_ucs-status.patch
-Patch74: bz1298430-2-fence_cisco_ucs-Add-missing-as-off.patch
-Patch75: bz1298430-3-Update-XML-metadata.patch
-Patch76: bz1298430-4-Update-XML-metadata.patch
-Patch77: bz1298430-1-fence_cisco_ucs-Obtain-status-from-different-attr.patch
-Patch78: bz1254821-fence_virsh-missing-as-off-1.patch
-Patch79: bz1254821-fence_virsh-missing-as-off-2.patch
-Patch80: bz1275250-fence_ipmilan-fix-power_wait-regression.patch
-Patch81: bz1286045-fence_ipmilan-add-diag-action.patch
-Patch82: bz1271780-fence_ipmilan-cycle-report-success-before-powered-off.patch
-Patch83: bz1280139-fence_scsi-fix-persistentl-typo-in-short-desc.patch
-Patch84: bz1280151-1-fence_scsi-remove-dev-dm-X-reference.patch
-Patch85: bz1280151-2-fence_scsi-remove-dev-dm-X-reference.patch
-Patch86: bz1287059-1-fence_rhevm-add-filter-header.patch
-Patch87: bz1296201-fence_amt_ws-new-fence-agent.patch
-Patch88: bz1313561-fence_compute-locate-all-instances-to-be-evacuated.patch
-Patch89: bz1285523-1-fence_compute-taggable-instance-support.patch
-Patch90: bz1285523-2-fence_compute-taggable-instance-support.patch
-Patch91: bz1334162-fence_compute-improved-fqdn-handling.patch
-Patch92: bz1342584-fence_apc-fix-connection-timed-out.patch
-Patch93: bz1287311-1-fence_compute-real-status-in-record-only-mode.patch
-Patch94: bz1287311-2-fence_compute-real-status-in-record-only-mode.patch
-Patch95: bz1298430-2-fence_cisco_ucs-status.patch
-Patch96: bz1287059-2-fence_rhevm-add-filter-header.patch
-Patch97: bz1387590-compute-fix-plug-domain-name-nova-force-down.patch
-Patch98: bz1390915-monitor_port_as_ip.patch
-Patch99: bz1337236-fence_sbd.patch
-Patch100: bz1410881-cisco_ucs-admin.patch
-Patch101: bz1384073-fence_compute-fix-connectionerror-exception.patch
-Patch102: bz1377389-fence_ipmilan-add-target-support.patch
-Patch103: bz1376481-1-fence_lpar-fix-monitor-fails.patch
-Patch104: bz1376481-2-fence_lpar-fix-monitor-fails.patch
-Patch105: bz1393962-fence_vmware_soap-ssl-insecure-suppress-warning.patch
-Patch106: bz1377972-1-CI-dont-test-paths-in-metadata.patch
-Patch107: bz1433948-1-validate-all-action.patch
-Patch108: bz1433948-2-validate-all-action.patch
-Patch109: bz1422499-fence_rhevm-disable-http-filter.patch
-Patch110: bz1403028-fencing-parameters_stdin.patch
-Patch111: bz1377972-2-CI-dont-test-paths-in-metadata.patch
-Patch112: bz1426693-1-fence_compute-project_id-to-project_name.patch
-Patch113: bz1426693-2-fence_compute-project_id-to-project_name.patch
-Patch114: bz1459199-fence_vmware_soap-fix-for-selfsigned-certificate.patch
-Patch115: bz1473860-1-fence_compute-fence_scsi-fix-parameters.patch
-Patch116: bz1473860-2-fence_compute-fence_scsi-fix-parameters.patch
-Patch117: bz1461854-remove-list-when-not-supported.patch
-Patch118: bz1451776-1-fence_aws-new-fence-agent.patch
-Patch119: bz1496390-fence_compute-fence_evacuate-Instance-HA-OSP12.patch
-Patch120: bz1490475-fence_ilo_ssh-fix-hard-reset.patch
-Patch121: bz1455383-fence_scsi-FIPS-support.patch
-Patch122: bz1449183-fence_ipmilan-hexadecimal-key-auth.patch
-Patch123: bz1476009-fence_azure_arm-new-fence-agent.patch
-Patch124: bz1396050-fence_vmware_rest-new-fence-agent.patch
-Patch125: bz1476401-1-adhere-no_status-in-fence_action.patch
-Patch126: bz1476401-2-enhance-run_delay.patch
-Patch127: bz1476401-3-add-sync_set_power-to-fence_action.patch
-Patch128: bz1476401-4-add-fence_heuristics_ping.patch
-Patch129: bz1465436-fence_ipmilan-fix-default-method-inconsistency.patch
-Patch130: bz1533170-fence_compute-fence_evacuate-add-support-for-keystone-v3-authentication.patch
-Patch131: bz1519370-fence_ilo3-default-to-onoff.patch
-Patch132: bz1451776-2-fence_aws-bundled-python-botocore.patch
-Patch133: bz1565670-fence_azure_arm-network-fencing.patch
-Patch134: bz1565701-fence_compute-fence_evacuate-fix-parameters.patch
+Source0: fence-agents/%{name}-%{version}.tar.xz
 
 %if 0%{?rhel}
-%global supportedagents amt_ws apc apc_snmp aws azure_arm bladecenter brocade cisco_mds cisco_ucs compute drac5 eaton_snmp emerson eps hpblade ibmblade ifmib ilo ilo_moonshot ilo_mp ilo_ssh intelmodular ipdu ipmilan mpath kdump rhevm rsa rsb sbd scsi vmware_rest vmware_soap wti
+%global supportedagents amt_ws apc apc_snmp aws azure_arm bladecenter brocade cisco_mds cisco_ucs compute drac5 eaton_snmp emerson eps hpblade ibmblade ifmib ilo ilo_moonshot ilo_mp ilo_ssh intelmodular ipdu ipmilan mpath kdump rhevm rsa rsb sbd scsi vmware_rest vmware_soap wti docker vbox evacuate
 %global allfenceagents fence-agents-amt-ws fence-agents-apc fence-agents-apc-snmp fence-agents-bladecenter fence-agents-brocade fence-agents-cisco-mds fence-agents-cisco-ucs fence-agents-compute fence-agents-drac5 fence-agents-eaton-snmp fence-agents-emerson fence-agents-eps fence-agents-heuristics-ping fence-agents-hpblade fence-agents-ibmblade fence-agents-ifmib fence-agents-ilo2 fence-agents-ilo-moonshot fence-agents-ilo-mp fence-agents-ilo-ssh fence-agents-intelmodular fence-agents-ipdu fence-agents-ipmilan fence-agents-mpath fence-agents-kdump fence-agents-rhevm fence-agents-rsa fence-agents-rsb fence-agents-sbd fence-agents-scsi fence-agents-vmware-rest fence-agents-vmware-soap fence-agents-wti
 %ifarch ppc64le
 %global testagents virsh lpar heuristics_ping
@@ -186,141 +51,6 @@ BuildRequires: iputils
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch0 -p1 -b .bz1072564-1
-%patch1 -p1 -b .bz1072564-2
-%patch2 -p1 -b .backward-fence_scsi_check_rename
-%patch3 -p1 -b .bz1121122-1
-%patch4 -p1 -b .bz1140921-1
-%patch5 -p1 -b .bz1111597-1
-%patch6 -p1 -b .bz1148762-1
-%patch7 -p1 -b .bz1153059-1
-%patch8 -p1 -b .bz1111599-1
-%patch9 -p1 -b .bz1162092-1
-%patch10 -p1 -b .bz1140921-2
-%patch11 -p1 -b .bz1140921-3
-%patch12 -p1 -b .bz1121122-2
-%patch13 -p1 -b .bz1121122-3
-%patch14 -p1 -b .bz1121122-3.5
-%patch15 -p1 -b .bz1121122-4
-%patch16 -p1 -b .bz1121122-5
-%patch17 -p1 -b .bz1173178-1
-%patch18 -p1 -b .tests-01
-%patch19 -p1 -b .tests-02
-%patch20 -p1 -b .bz1199970-1
-%patch21 -p1 -b .bz1203877-1
-%patch22 -p1 -b .bz1214359-1
-%patch23 -p1 -b .bz1214359-2
-%patch24 -p1 -b .bz1214359-3
-%patch25 -p1 -b .bz1214359-4
-%patch26 -p1 -b .test-01-fix_xml_metadata.patch
-%patch27 -p1 -b .bz1213571
-%patch28 -p1 -b .bz1214919
-%patch29 -p1 -b .bz1145769
-%patch30 -p1 -b .bz1165591
-%patch31 -p1 -b .bz1196068
-%patch32 -p1 -b .bz1196068-2
-%patch33 -p1 -b .bz1196068-3
-%patch34 -p1 -b .bz1196068-4
-%patch35 -p1 -b .bz1207982
-%patch36 -p1 -b .bz1171732.1
-%patch37 -p1 -b .bz1171732.2
-%patch38 -p1 -b .bz1171732.3
-%patch39 -p1 -b .bz1188750.0
-%patch40 -p1 -b .bz1188750
-%patch41 -p1 -b .bz1214359-5
-%patch42 -p1 -b .bz1214359-6
-%patch43 -p1 -b .bz1216997
-%patch44 -p1 -b .bz1102727
-%patch45 -p1 -b .bz1102727-2
-%patch46 -p1 -b .bz1214359-7
-%patch47 -p1 -b .bz1214522
-%patch48 -p1 -b .bz1102727-2
-%patch49 -p1 -b .bz1243485-1
-%patch50 -p1 -b .bz1243485-2
-%patch51 -p1 -b .bz1250586
-%patch52 -p1 -b .bz1214522-2
-%patch53 -p1 -b .bz1214522-3
-%patch54 -p1 -b .bz1185329
-%patch55 -p1 -b .bz1251491
-%patch56 -p1 -b .bz1214522-4
-%patch57 -p1 -b .bz1214522-5
-%patch58 -p1 -b .bz1102727-3
-%patch59 -p1 -b .bz1250586-2
-%patch60 -p1 -b .bz1243485-3
-%patch61 -p1 -b .bz1241648
-%patch62 -p1 -b .bz1257137-1
-%patch63 -p1 -b .bz1257137-2
-%patch64 -p1 -b .bz1256908
-%patch65 -p1 -b .bz1259319
-%patch66 -p1 -b .bz1257137-3
-%patch67 -p1 -b .bz1274432-1
-%patch68 -p1 -b .bz1265426-1
-%patch69 -p1 -b .bz1265426-2
-%patch70 -p1 -b .bz1265426-3
-%patch71 -p1 -b .bz1265426-4
-%patch72 -p1 -b .bz1283084
-%patch73 -p1 -b .bz1298430
-%patch74 -p1 -b .bz1298430-2
-%patch75 -p1 -b	.bz1298430-3
-%patch76 -p1 -b	.bz1298430-4
-%patch77 -p1 -b .bz1298430-1
-%patch78 -p1 -b .bz1254821-1
-%patch79 -p1 -b .bz1254821-2
-%patch80 -p1 -b .bz1275250
-%patch81 -p1 -b .bz1286045
-%patch82 -p1 -b .bz1271780
-%patch83 -p1 -b .bz1280139
-%patch84 -p1 -b .bz1280151-1
-%patch85 -p1 -F1 -b .bz1280151-2
-%patch86 -p1 -b .bz1287059-1
-%patch87 -p1 -b .bz1296201
-%patch88 -p1 -b .bz1313561
-%patch89 -p1 -b .bz1285523-1
-%patch90 -p1 -b .bz1285523-2
-%patch91 -p1 -b .bz1334162
-%patch92 -p1 -b .bz1342584
-%patch93 -p1 -b .bz1287311-1
-%patch94 -p1 -F2 -b .bz1287311-2
-%patch95 -p1 -b .bz1298430-2
-%patch96 -p1 -F2 -b .bz1287059-2
-%patch97 -p1 -b .bz1387590
-%patch98 -p1 -b .bz1390915
-%patch99 -p1 -b .bz1337236
-%patch100 -p1 -b .bz1410881
-%patch101 -p1 -b .bz1384073
-%patch102 -p1 -b .bz1377389
-%patch103 -p1 -F2 -b .bz1376481-1
-%patch104 -p1 -b .bz1376481-2
-%patch105 -p1 -b .bz1393962
-%patch106 -p1 -b .bz1377972-1
-%patch107 -p1 -b .bz1433948-1
-%patch108 -p1 -F1 -b .bz1433948-2
-%patch109 -p1 -b .bz1422499
-%patch110 -p1 -b .bz1403028
-%patch111 -p1 -b .bz1377972-2
-%patch112 -p1 -b .bz1426693-1
-%patch113 -p1 -b .bz1426693-2
-%patch114 -p1 -b .bz1459199
-%patch115 -p1 -b .bz1473860-1
-%patch116 -p1 -b .bz1473860-2
-%patch117 -p1 -b .bz1461854
-%patch118 -p1 -b .bz1451776-1
-%patch119 -p1 -b .bz1496390
-%patch120 -p1 -F1 -b .bz1490475
-%patch121 -p1 -b .bz1455383
-%patch122 -p1 -b .bz1449183
-%patch123 -p1 -b .bz1476009
-%patch124 -p1 -b .bz1396050
-%patch125 -p1 -b .bz1476401-1
-%patch126 -p1 -b .bz1476401-2
-%patch127 -p1 -b .bz1476401-3
-%patch128 -p1 -b .bz1476401-4
-%patch129 -p1 -b .bz1465436
-%patch130 -p1 -b .bz1533170
-%patch131 -p1 -b .bz1519370
-%patch132 -p1 -b .bz1451776-2
-%patch133 -p1 -b .bz1565670
-%patch134 -p1 -b .bz1565701
 
 %build
 ./autogen.sh
@@ -439,7 +169,9 @@ The fence-agents-apc-snmp package contains a fence agent for APC devices that ar
 %files apc-snmp
 %defattr(-,root,root,-)
 %{_sbindir}/fence_apc_snmp
+%{_sbindir}/fence_tripplite_snmp
 %{_mandir}/man8/fence_apc_snmp.8*
+%{_mandir}/man8/fence_tripplite_snmp.8*
 
 %package aws
 License: GPLv2+ and LGPLv2+
@@ -540,6 +272,20 @@ The fence-agents-compute package contains a fence agent for Nova compute nodes.
 %{_sbindir}/fence_evacuate
 %{_mandir}/man8/fence_compute.8*
 %{_mandir}/man8/fence_evacuate.8*
+
+%package docker
+License: GPLv2+ and LGPLv2+
+Group: System Environment/Base
+Summary: Fence agent for Docker
+Requires: pycurl
+Requires: fence-agents-common = %{version}-%{release}
+Obsoletes: fence-agents
+%description docker
+The fence-agents-docker package contains a fence agent for Docker images that are accessed over HTTP.
+%files docker
+%defattr(-,root,root,-)
+%{_sbindir}/fence_docker
+%{_mandir}/man8/fence_docker.8*
 
 %package drac5
 License: GPLv2+ and LGPLv2+
@@ -905,10 +651,22 @@ The fence-agents-scsi package contains fence agent for SCSI persisent reservatio
 %files scsi
 %defattr(-,root,root,-)
 %{_sbindir}/fence_scsi
-%{_datadir}/cluster/fence_scsi_check.pl
 %{_datadir}/cluster/fence_scsi_check
 %{_datadir}/cluster/fence_scsi_check_hardreboot
 %{_mandir}/man8/fence_scsi.8*
+
+%package vbox
+License: GPLv2+ and LGPLv2+
+Group: System Environment/Base
+Summary: Fence agent for VirtualBox
+Requires: fence-agents-common >= %{version}-%{release}
+Obsoletes: fence-agents
+%description vbox
+The fence-agents-vbox package contains a fence agent for VirtualBox
+%files vbox
+%defattr(-,root,root,-)
+%{_sbindir}/fence_vbox
+%{_mandir}/man8/fence_vbox.8*
 
 %package virsh
 License: GPLv2+ and LGPLv2+
