@@ -15,20 +15,24 @@
 
 Name: fence-agents
 Summary: Fence Agents for Red Hat Cluster
-Version: 4.0.25
+Version: 4.2.1
 Release: 1%{?alphatag:.%{alphatag}}%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
-URL: http://sourceware.org/cluster/wiki/
+URL: https://github.com/ClusterLabs/fence-agents
 Source0: fence-agents/%{name}-%{version}.tar.xz
 
 %if 0%{?rhel}
-%global supportedagents apc apc_snmp bladecenter brocade cisco_mds cisco_ucs compute docker drac5 eaton_snmp emerson eps hpblade ibmblade ifmib ilo ilo_moonshot ilo_mp ilo_ssh intelmodular ipdu ipmilan mpath kdump rhevm rsa rsb sbd scsi vbox vmware_soap wti
-%global allfenceagents fence-agents-apc fence-agents-apc-snmp fence-agents-bladecenter fence-agents-brocade fence-agents-cisco-mds fence-agents-cisco-ucs fence-agents-compute fence-agents-docker fence-agents-drac5 fence-agents-eaton-snmp fence-agents-emerson fence-agents-eps fence-agents-hpblade fence-agents-ibmblade fence-agents-ifmib fence-agents-ilo2 fence-agents-ilo-moonshot fence-agents-ilo-mp fence-agents-ilo-ssh fence-agents-intelmodular fence-agents-ipdu fence-agents-ipmilan fence-agents-mpath fence-agents-kdump fence-agents-rhevm fence-agents-rsa fence-agents-rsb fence-agents-sbd fence-agents-scsi fence-agents-vbox fence-agents-vmware-soap fence-agents-wti
+%global supportedagents amt_ws apc apc_snmp aws azure_arm bladecenter brocade cisco_mds cisco_ucs compute drac5 eaton_snmp emerson eps hpblade ibmblade ifmib ilo ilo_moonshot ilo_mp ilo_ssh intelmodular ipdu ipmilan mpath kdump rhevm rsa rsb sbd scsi vmware_rest vmware_soap wti docker vbox evacuate
+%global allfenceagents fence-agents-amt-ws fence-agents-apc fence-agents-apc-snmp fence-agents-bladecenter fence-agents-brocade fence-agents-cisco-mds fence-agents-cisco-ucs fence-agents-compute fence-agents-drac5 fence-agents-eaton-snmp fence-agents-emerson fence-agents-eps fence-agents-heuristics-ping fence-agents-hpblade fence-agents-ibmblade fence-agents-ifmib fence-agents-ilo2 fence-agents-ilo-moonshot fence-agents-ilo-mp fence-agents-ilo-ssh fence-agents-intelmodular fence-agents-ipdu fence-agents-ipmilan fence-agents-mpath fence-agents-kdump fence-agents-rhevm fence-agents-rsa fence-agents-rsb fence-agents-sbd fence-agents-scsi fence-agents-vmware-rest fence-agents-vmware-soap fence-agents-wti
+%ifarch ppc64le
+%global testagents virsh lpar heuristics_ping
+%endif
 %ifarch s390x
-%global testagents virsh zvm
-%else
-%global testagents virsh
+%global testagents virsh zvm heuristics_ping
+%endif
+%ifnarch ppc64le s390x
+%global testagents virsh heuristics_ping
 %endif
 %endif
 
@@ -40,9 +44,10 @@ BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildRequires: glibc-devel
 BuildRequires: gnutls-utils
 BuildRequires: libxslt
-BuildRequires: python pexpect python-pycurl python-suds python-requests
+BuildRequires: python pexpect python-pycurl python-suds python-requests openwsman-python
 BuildRequires: net-snmp-utils
 BuildRequires: autoconf automake libtool
+BuildRequires: iputils
 
 %prep
 %setup -q -n %{name}-%{version}
@@ -73,9 +78,12 @@ power management for several devices.
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
 Summary: Common utilities for fence agents
-Requires: python pexpect
+Requires: python pexpect python-pycurl policycoreutils-python selinux-policy-targeted
 %description common
 Red Hat Fence Agents is a collection of scripts and libraries to handle remote power management for various devices.
+%post common
+/usr/sbin/semanage boolean -S targeted -N -m --on fenced_can_ssh
+/usr/sbin/semanage boolean -S targeted -N -m --on fenced_can_network_connect
 %files common
 %defattr(-,root,root,-)
 %doc doc/COPYING.* doc/COPYRIGHT doc/README.licence
@@ -83,14 +91,21 @@ Red Hat Fence Agents is a collection of scripts and libraries to handle remote p
 %{_datadir}/cluster
 %{_datadir}/fence/fencing.py
 %{_datadir}/fence/fencing_snmp.py
+%exclude %{_datadir}/cluster/fence_scsi_check*
 
 %package all
-License: GPLv2+ and LGPLv2+
+License: GPLv2+, LGPLv2+ and ASL 2.0
 Group: System Environment/Base
 Summary: Fence agents
-Requires: %{allfenceagents}
+Requires: %(echo "%{allfenceagents}" | sed "s/\( \|$\)/ >= %{version}-%{release}\1/g")
 %ifarch i686 x86_64
 Requires: fence-virt
+%endif
+%ifarch ppc64le
+Requires: fence-agents-lpar >= %{version}-%{release}
+%endif
+%ifarch s390x
+Requires: fence-agents-zvm >= %{version}-%{release}
 %endif
 Provides: fence-agents = %{version}-%{release}
 Obsoletes: fence-agents < 3.1.13
@@ -113,6 +128,20 @@ Red Hat Fence Agents
 %{_sbindir}/fence_alom
 %{_mandir}/man8/fence_alom.8*
 %endif
+
+%package amt-ws
+License: ASL 2.0
+Group: System Environment/Base
+Summary: Fence agent for AMT (WS-Man) devices
+Requires: fence-agents-common >= %{version}-%{release}
+Requires: openwsman-python >= 2.6.3-1.git4391e5c.el7
+Obsoletes: fence-agents
+%description amt-ws
+The fence-agents-amt-ws package contains a fence agent for AMT (WS-Man) devices.
+%files amt-ws
+%defattr(-,root,root,-)
+%{_sbindir}/fence_amt_ws
+%{_mandir}/man8/fence_amt_ws.8*
 
 %package apc
 License: GPLv2+ and LGPLv2+
@@ -143,6 +172,35 @@ The fence-agents-apc-snmp package contains a fence agent for APC devices that ar
 %{_sbindir}/fence_tripplite_snmp
 %{_mandir}/man8/fence_apc_snmp.8*
 %{_mandir}/man8/fence_tripplite_snmp.8*
+
+%package aws
+License: GPLv2+ and LGPLv2+
+Group: System Environment/Base
+Summary: Fence agent for Amazon AWS
+Requires: fence-agents-common >= %{version}-%{release}
+Requires: python-boto3
+Obsoletes: fence-agents
+%description aws
+The fence-agents-aws package contains a fence agent for Amazon AWS instances. 
+%files aws
+%defattr(-,root,root,-)
+%{_sbindir}/fence_aws
+%{_mandir}/man8/fence_aws.8*
+
+%package azure-arm
+License: GPLv2+ and LGPLv2+
+Group: System Environment/Base
+Summary: Fence agent for Azure Resource Manager
+Requires: fence-agents-common >= %{version}-%{release}
+Requires: python-azure-sdk
+Obsoletes: fence-agents
+%description azure-arm
+The fence-agents-azure-arm package contains a fence agent for Azure instances. 
+%files azure-arm
+%defattr(-,root,root,-)
+%{_sbindir}/fence_azure_arm
+%{_mandir}/man8/fence_azure_arm.8*
+%{_datadir}/fence/azure_fence.py
 
 %package bladecenter
 License: GPLv2+ and LGPLv2+
@@ -191,7 +249,6 @@ License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
 Summary: Fence agent for Cisco UCS series
 Requires: fence-agents-common >= %{version}-%{release}
-Requires: pycurl
 Obsoletes: fence-agents
 %description cisco-ucs
 The fence-agents-cisco-ucs package contains a fence agent for Cisco UCS series devices that are accessed via the SNMP protocol.
@@ -212,7 +269,9 @@ The fence-agents-compute package contains a fence agent for Nova compute nodes.
 %files compute
 %defattr(-,root,root,-)
 %{_sbindir}/fence_compute
+%{_sbindir}/fence_evacuate
 %{_mandir}/man8/fence_compute.8*
+%{_mandir}/man8/fence_evacuate.8*
 
 %package docker
 License: GPLv2+ and LGPLv2+
@@ -281,6 +340,20 @@ The fence-agents-eps package contains a fence agent for ePowerSwitch 8M+ power s
 %defattr(-,root,root,-)
 %{_sbindir}/fence_eps
 %{_mandir}/man8/fence_eps.8*
+
+%package heuristics-ping
+License: GPLv2+ and LGPLv2+
+Group: System Environment/Base
+Summary: Fence agent used to control other fence agents based on ping-heuristics
+Requires: fence-agents-common >= %{version}-%{release}
+Obsoletes: fence-agents
+%description heuristics-ping
+
+The fence-agents-heuristics-ping package contains fence agent used to control other fence agents based on ping-heuristics
+%files heuristics-ping
+%defattr(-,root,root,-)
+%{_sbindir}/fence_heuristics_ping
+%{_mandir}/man8/fence_heuristics_ping.8*
 
 %package hpblade
 License: GPLv2+ and LGPLv2+
@@ -481,7 +554,7 @@ The fence-agents-ldom package contains a fence agent for Sun LDom devices that a
 %{_mandir}/man8/fence_ldom.8*
 %endif
 
-%if 0%{?fedora}
+%ifarch ppc64le
 %package lpar
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
@@ -557,11 +630,11 @@ The fence-agents-sanbox2 package contains a fence agent for QLogic SANBox2 switc
 %package sbd
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
-Summary: Fence agent for SBD
+Summary: Fence agent for SBD (storage-based death)
 Requires: fence-agents-common >= %{version}-%{release}
 Obsoletes: fence-agents
 %description sbd
-The fence-agents-sbd package contains a fence agent for SBD
+The fence-agents-sbd package contains fence agent for SBD (storage-based death)
 %files sbd
 %defattr(-,root,root,-)
 %{_sbindir}/fence_sbd
@@ -609,6 +682,19 @@ The fence-agents-virsh package contains a fence agent for virtual machines that 
 %{_sbindir}/fence_virsh
 %{_mandir}/man8/fence_virsh.8*
 
+%package vmware-rest
+License: GPLv2+ and LGPLv2+
+Group: System Environment/Base
+Summary: Fence agent for VMWare with REST API
+Requires: fence-agents-common >= %{version}-%{release}
+Obsoletes: fence-agents
+%description vmware-rest
+The fence-agents-vmware-rest package contains a fence agent for VMWare with REST API
+%files vmware-rest
+%defattr(-,root,root,-)
+%{_sbindir}/fence_vmware_rest
+%{_mandir}/man8/fence_vmware_rest.8*
+
 %package vmware-soap
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
@@ -654,21 +740,249 @@ The fence-agents-zvm package contains a fence agent for z/VM hypervisors
 %endif
 
 %changelog
-* Tue Feb 09 2016 Marek Grac <mgrac@redhat.com> - 4.0.11-27.5
-- fence_cisco_ucs: Change endpoint for 'status' action
-  Resolves: rhb#1303698
+* Thu Apr 12 2018 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-86.2
+- fence_azure_arm: fix subscriptionId from metadata
+  Resolves: rhbz#1566632
 
-* Tue Feb 02 2016 Marek Grac <mgrac@redhat.com> - 4.0.11-27.4
-- fence_cisco_ucs: Change endpoint for 'status' action
-  Resolves: rhb#1303698
+* Wed Apr 11 2018 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-86.1
+- fence_azure_arm: add network-fencing
+  Resolves: rhbz#1565670
+- fence_compute/fence_evacuate: fix parameters
+  Resolves: rhbz#1565701
+
+* Wed Feb  7 2018 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-86
+- fence-agents-all: remove fence-agents-aws and fence-agents-azure-arm
+  dependencies
+  Resolves: rhbz#1476009
+
+* Tue Feb  6 2018 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-85
+- fence_aws: add python-boto3 dependency
+  Resolves: rhbz#1540700
+
+* Mon Jan 22 2018 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-84
+- fence_azure_arm: new fence agent
+  Resolves: rhbz#1476009
+
+* Thu Jan 11 2018 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-83
+- fence_compute/fence_evacuate: add support for keystone v3 authentication
+  Resolves: rhbz#1533170
+- fence_ilo3: default to onoff
+  Resolves: rhbz#1519370
+
+* Tue Nov 28 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-82
+- fence_vmware_rest: new fence agent
+  Resolves: rhbz#1396050
+
+* Tue Nov  7 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-81
+- common: add selinux-policy-targeted dependency
+  Resolves: rhbz#1509327
+
+* Fri Nov  3 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-80
+- fence_ipmilan: fix default method inconsistency (help/man page)
+  Resolves: rhbz#1465436
+
+* Wed Nov  1 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-78
+- fence_heuristics_ping: new fence agent
+  Resolves: rhbz#1476401
+
+* Thu Oct 26 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-77
+- fence_ilo_ssh: fix "hard reset"
+  Resolves: rhbz#1490475
+
+* Wed Oct 25 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-76
+- fence_ipmilan: add support for hexadecimal key authentication
+  Resolves: rhbz#1449183
+
+* Tue Oct 24 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-75
+- fence_aws: new fence agent
+  Resolves: rhbz#1451776
+
+* Fri Oct  6 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-72
+- fence_amt_ws: new fence agent
+  Resolves: rhbz#1296201
+
+* Fri Sep 29 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-70
+- fence-agents-all: require agents to be the same version
+  Resolves: rhbz#1484128
+
+* Fri Sep 29 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-69
+- fence_scsi: add FIPS support
+  Resolves: rhbz#1455383
+
+* Thu Sep 28 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-68
+- fence_compute/fence_scsi: fix issue with some parameters
+  Resolves: rhbz#1473860
+- fence_compute/fence_evacuate: changes to support Instance HA on OSP12
+  Resolves: rhbz#1496390
+- fence-agents-common: remove fence_scsi_check-files that should only be in
+  the scsi subpackage
+  Resolves: rhbz#1484128
+
+* Wed Aug  2 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-67
+- Remove "list" when not supported
+  Resolves: rhbz#1461854
+
+* Fri Jun 16 2017 Marek Grac <mgrac@redhat.com> - 4.0.11-66
+- Set SELinux booleans even when SELinux is disabled
+  Resolves: rhbz#1457887
+
+* Thu Jun 15 2017 Marek Grac <mgrac@redhat.com> - 4.0.11-65
+- Set SELinux booleans even when SELinux is disabled
+  Resolves: rhbz#1457887
+
+* Wed Jun  7 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-64
+- fence_vmware_soap: fix for self-signed certificates
+  Resolves: rhbz#1459199
+
+* Tue May 30 2017 Marek Grac <mgrac@redhat.com> - 4.0.11-63
+- Add dependencies on policycoreutils
+  Resolves: rhbz#1427986
+
+* Wed May 17 2017 Marek Grac <mgrac@redhat.com> - 4.0.11-62
+- Set SELinux booleans required for fence agent integration with cluster
+  Resolves: rhbz#1427986
+
+* Thu May  4 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-61
+- fence_ipmilan: add target (ipmilan -t <target>) support
+  Resolves: rhbz#1377389
+
+* Mon Apr  3 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-60
+- fence_compute: fix project_id changed to project_name in Nova API
+  Resolves: rhbz#1426693
+
+* Thu Mar 23 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-58
+- CI: dont test paths in metadata
+  Resolves: rhbz#1377972
+
+* Wed Mar 22 2017 Marek Grac <mgrac@redhat.com> - 4.0.11-57
+- Set SELinux booleans required for fence agent integration with cluster
+  Resolves: rhbz#1427986
+- Add consistency of parameters between STDIN and command-line
+  Resolves: rhbz#1403028
+
+* Tue Mar 21 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-56
+- fencing: add validate-all action
+  Resolves: rhbz#1433948
+- fence_rhevm: add "--disable-http-filter" to be able to explicitly
+  use oVirt API version 3
+  Resolves: rhbz#1422499
+
+* Wed Mar 01 2017 Marek Grac <mgrac@redhat.com> - 4.0.11-54
+- fence_lpar: Fix monitor action on IVM systems
+  Resolves: rhbz#1376481
+
+* Tue Feb 21 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-53
+- fence_compute: Improved FQDN and Nova handling
+  Resolves: rhbz#1387590
+
+* Tue Feb 14 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-52
+- fence_compute: fix ConnectionError
+  Resolves: rhbz#1384073
+- fence_lpar: add IVM support and improve error handling
+  Resolves: rhbz#1376481
+- fence_vmware_soap: suppress warning for --ssl-insecure
+  Resolves: rhbz#1393962
+- Add support for "s" for seconds for delay, *_timeout, *_wait parameters
+  Resolves: rhbz#1377928
+- fence-agents-zvm: add to fence-agents-all dependencies for s390x
+  Resolves: rhbz#1255700
+- Build for ppc64le
+  Resolves: rhbz#1402566
+
+* Mon Jan 23 2017 Marek Grac <mgrac@redhat.com>
+- fence_cisco_ucs: Change commands send to UCS
+  Resolves: rhbz#1410881
+
+* Wed Jan 11 2017 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-50
+- fence_sbd: new fence agent
+  Resolves: rhbz#1337236
+
+* Wed Nov 23 2016 Marek Grac <mgrac@redhat.com> - 4.0.11-49
+- fencing: Fix 'monitor' action for devices with --port-as-ip
+  Resolves: rhbz#1390915
+
+* Wed Aug 31 2016 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-47
+- fence_rhevm: fix issues on RHEV 4
+  Resolves: rhbz#1287059
+
+* Thu Aug 25 2016 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-46
+  Resolves: rhbz#1298430
+
+* Thu Aug 25 2016 Marek Grac <mgrac@redhat.com> - 4.0.11-45
+- fence_cisco_ucs: Change method for obtaining status
+  Resolves: rhbz#1298430
+
+* Wed Aug 17 2016 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-44
+- fence_mpath: update info to say unique key per node instead of per
+  node/device
+  Resolves: rhbz#1280151
+
+* Tue Jul 12 2016 Marek Grac <mgrac@redhat.com> - 4.0.11-43
+- change in spec file
+  Resolves: rhbz#1353221
+
+* Thu Jul  7 2016 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-42
+- fence-agents-common: add dependency on python-pycurl
+  Resolves: rhbz#1353221
+
+* Wed Jul  6 2016 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-41
+- fence_compute: perform real status operation in record-only mode
+  Resolves: rhbz#1287311
+
+* Mon Jul  4 2016 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-40
+- fence_compute: improved FQDN handling
+  Resolves: rhbz#1334162
+
+* Wed Jun 22 2016 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-39
+- fence_apc: fix "Connection timed out" issue
+  Resolves: rhbz#1342584
+
+* Wed Jun 15 2016 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-38
+- fence_compute: advertise as fabric device
+  Resolves: rhbz#1287301
+
+* Tue Jun 14 2016 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-37
+- fence_compute: add taggable instance support
+  Resolves: rhbz#1285523
+
+* Tue May 31 2016 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.0.11-34
+- fence_virsh: add --missing-as-off
+  Resolves: rhbz#1254821
+- fence_ipmilan: fix power_wait regression
+  Resolves: rhbz#1275250
+- fence_ipmilan: add diag action
+  Resolves: rhbz#1286045
+- fence_ipmilan: warn that cycle method can report success before node
+  is powered off
+  Resolves: rhbz#1271780
+- fence_scsi: fix persistentl typo in short desc
+  Resolves: rhbz#1280139
+- fence_scsi: remove /dev/dm-X reference
+  Resolves: rhbz#1280151
+- fence_rhevm: add Filter header
+  Resolves: rhbz#1287059
+- fence_compute: fix to locate all instances to be evacuated
+  Resolves: rhbz#1313561
+
+* Mon Feb 22 2016 Marek Grac <mgrac@redhat.com> - 4.0.11-33
+- fence_cisco_ucs: Obtain status from different attribute
+  Resolves: rhbz#1298430
+
+* Tue Feb 09 2016 Marek Grac <mgrac@redhat.com> - 4.0.11-32
+- fence_cisco_ucs: Obtain status from different endpoint
+  Resolves: rhbz#1298430
+
+* Mon Feb 01 2016 Marek Grac <mgrac@redhat.com> - 4.0.11-31
+- fence_cisco_ucs: Obtain status from different endpoint
+  Resolves: rhbz#1298430
 
 * Wed Jan 20 2016 Marek Grac <mgrac@redhat.com> - 4.0.11-30
 - fence_compute: Replace with current implementation
-  Resolves: rhbz#1299577
+  Resolves: rhbz#1283084
 
-* Wed Dec 16 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-27.2
+* Wed Dec 16 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-28
 - fence_scsi: Add fence_scsi_check_hardreboot
-  Resolves: rhbz#bz1292071
+  Resolves: rhbz#bz1265426
 
 * Mon Oct 26 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-27
 - fence_brocade: Fix return status in get_power_status
@@ -699,6 +1013,7 @@ The fence-agents-zvm package contains a fence agent for z/VM hypervisors
   Resolves: 1102727
 - manual pages now describe 'list-status' properly
 
+bz1102727-3-fence_mpath.patch bz1250586-2-list_status.patch
 * Tue Aug 11 2015 Marek Grac <mgrac@redhat.com> - 4.0.11-20
 - fencing: Fix place where --plug + --port-as-ip are tested
   Resolves: rhbz#1214522
