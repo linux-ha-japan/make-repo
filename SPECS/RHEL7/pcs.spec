@@ -1,6 +1,6 @@
 Name: pcs
-Version: 0.9.162
-Release: 5%{?dist}.1
+Version: 0.9.165
+Release: 1%{?dist}
 License: GPLv2
 URL: https://github.com/ClusterLabs/pcs
 Group: System Environment/Base
@@ -8,53 +8,10 @@ Summary: Pacemaker Configuration System
 #building only for architectures with pacemaker and corosync available
 ExclusiveArch: i686 x86_64 s390x ppc64le
 
-%global pcs_snmp_pkg_name  pcs-snmp
-%global pyagentx_version   0.4.pcs.1
-%global bundled_lib_dir    pcs/bundled
-%global pyagentx_dir       %{bundled_lib_dir}/pyagentx
 
 #part after last slash is recognized as filename in look-aside repository
 #desired name is achived by trick with hash anchor
 Source0: %{url}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1: HAM-logo.png
-Source2: pcsd-bundle-config-1
-
-Source11: https://rubygems.org/downloads/backports-3.9.1.gem
-Source12: https://rubygems.org/downloads/multi_json-1.12.2.gem
-Source13: https://rubygems.org/downloads/open4-1.3.4.gem
-Source14: https://rubygems.org/downloads/orderedhash-0.0.6.gem
-Source15: https://rubygems.org/downloads/rack-protection-1.5.5.gem
-Source16: https://rubygems.org/downloads/rack-test-0.7.0.gem
-Source17: https://rubygems.org/downloads/rack-1.6.4.gem
-Source18: https://rubygems.org/downloads/rpam-ruby19-1.2.1.gem
-Source19: https://rubygems.org/downloads/sinatra-contrib-1.4.7.gem
-Source20: https://rubygems.org/downloads/sinatra-1.4.8.gem
-Source21: https://rubygems.org/downloads/tilt-2.0.8.gem
-Source22: https://rubygems.org/downloads/ethon-0.10.1.gem
-Source23: https://rubygems.org/downloads/ffi-1.9.18.gem
-
-Source31: https://github.com/testing-cabal/mock/archive/1.0.1.tar.gz#/mock-1.0.1.tar.gz
-Source41: https://github.com/ondrejmular/pyagentx/archive/v%{pyagentx_version}.tar.gz#/pyagentx-%{pyagentx_version}.tar.gz
-Patch1: fix-skip-offline-in-pcs-quorum-device-remove.patch
-Patch2: bz1367808-01-fix-formating-of-assertion-error-in-snmp.patch
-Patch3: bz1367808-02-change-snmp-agent-logfile-path.patch
-Patch4: bz1421702-01-gui-allow-forcing-resource-stonith-create-update.patch
-Patch5: bz1522813-01-fix-a-crash-when-wait-is-used-in-stonith-create.patch
-Patch6: bz1523378-01-warn-when-a-stonith-device-has-method-cycle-set.patch
-Patch7: bz1464781-01-fix-exit-code-when-adding-a-remote-or-guest-node.patch
-Patch8: bz1527530-01-fix-a-crash-in-pcs-booth-sync.patch
-Patch9: bz1415197-01-fix-pcs-cluster-auth.patch
-Patch10: bz1415197-02-fix-pcs-cluster-auth.patch
-Patch98: bz1458153-01-give-back-orig.-master-behav.-resource-create.patch
-Patch99: bz1459503-01-OSP-workarounds-not-compatible-wi.patch
-Patch100: rhel7.patch
-#next patch is needed for situation when the rhel6 cluster is controlled from
-#rhel7 gui
-Patch101: change-cman-to-rhel6-in-messages.patch
-Patch102: show-only-warning-when-crm_mon-xml-is-invalid.patch
-Patch103: bz1557253-01-get-rid-of-debug-when-calling-local-pcsd.patch
-Patch104: bz1557253-02-sanitize-path-when-saving-booth-config-files.patch
-Patch105: bz1557253-03-use-rubygem-rack-protection-1.5.5.patch
 
 # git for patches
 BuildRequires: git
@@ -69,26 +26,10 @@ BuildRequires: python-pycurl
 BuildRequires: gcc
 BuildRequires: gcc-c++
 # ruby and gems for pcsd
-BuildRequires: ruby >= 2.0.0
-BuildRequires: rubygems
 BuildRequires: ruby-devel
-# pam devel for compiling rubygem-rpam-ruby19
-BuildRequires: pam-devel
-BuildRequires: rubygem-bundler
-BuildRequires: rubygem-json
-BuildRequires: rubygem-minitest
-#for building rubygem-ffi
-BuildRequires: libffi-devel
 
 # following for UpdateTimestamps sanitization function
 BuildRequires: diffstat
-BuildRequires: systemd-units
-#for tests
-BuildRequires: python-lxml
-BuildRequires: corosync
-BuildRequires: pacemaker
-BuildRequires: pacemaker-cli
-BuildRequires: fence-agents-all
 # pcsd fonts and font management tools
 BuildRequires: fontconfig
 BuildRequires: liberation-sans-fonts
@@ -98,11 +39,6 @@ BuildRequires: overpass-fonts
 Requires: python
 Requires: python-lxml
 Requires: python-setuptools
-Requires: python-clufter >= 0.59.0
-Requires: python-pycurl
-# ruby and gems for pcsd
-Requires: ruby >= 2.0.0
-Requires: rubygem-json
 # for killall
 Requires: psmisc
 # for working with certificates (validation etc.)
@@ -119,42 +55,9 @@ Requires(postun): systemd
 Requires: liberation-sans-fonts
 Requires: overpass-fonts
 
-Provides: bundled(rubygem-backports) = 3.6.8
-Provides: bundled(rubygem-multi_json) = 1.12.1
-Provides: bundled(rubygem-open4) = 1.3.4
-Provides: bundled(rubygem-orderedhash) = 0.0.6
-Provides: bundled(rubygem-rack) = 1.6.4
-Provides: bundled(rubygem-rack-protection) = 1.5.5
-Provides: bundled(rubygem-rack-test) = 0.6.3
-Provides: bundled(rubygem-rpam-ruby19) = 1.2.1
-Provides: bundled(rubygem-sinatra) = 1.4.8
-Provides: bundled(rubygem-sinatra-contrib) = 1.4.7
-Provides: bundled(rubygem-tilt) = 2.0.6
-Provides: bundled(rubygem-ethon) = 0.10.1
-Provides: bundled(rubygem-ffi) = 1.9.17
-
 %description
 pcs is a corosync and pacemaker configuration tool.  It permits users to
 easily view, modify and create pacemaker based clusters.
-
-# pcs-snmp package definition
-%package -n %{pcs_snmp_pkg_name}
-Group: System Environment/Base
-Summary: Pacemaker cluster SNMP agent
-License: GPLv2, BSD 2-clause
-URL: https://github.com/ClusterLabs/pcs
-
-# tar for unpacking pyagetx source tar ball
-BuildRequires: tar
-
-Requires: pcs = %{version}-%{release}
-Requires: pacemaker
-Requires: net-snmp
-
-Provides: bundled(pyagentx) = %{pyagentx_version}
-
-%description -n %{pcs_snmp_pkg_name}
-SNMP agent that provides information about pacemaker cluster to the master agent (snmpd)
 
 %define PCS_PREFIX /usr
 %prep
@@ -173,53 +76,6 @@ UpdateTimestamps() {
     touch -r $PatchFile $f
   done
 }
-UpdateTimestamps -p1 %{PATCH1}
-UpdateTimestamps -p1 %{PATCH2}
-UpdateTimestamps -p1 %{PATCH3}
-UpdateTimestamps -p1 %{PATCH4}
-UpdateTimestamps -p1 %{PATCH5}
-UpdateTimestamps -p1 %{PATCH6}
-UpdateTimestamps -p1 %{PATCH7}
-UpdateTimestamps -p1 %{PATCH8}
-UpdateTimestamps -p1 %{PATCH9}
-UpdateTimestamps -p1 %{PATCH10}
-UpdateTimestamps -p1 %{PATCH98}
-UpdateTimestamps -p1 %{PATCH99}
-UpdateTimestamps -p1 %{PATCH100}
-UpdateTimestamps -p1 %{PATCH101}
-UpdateTimestamps -p1 %{PATCH102}
-UpdateTimestamps -p1 %{PATCH103}
-UpdateTimestamps -p1 %{PATCH104}
-UpdateTimestamps -p1 %{PATCH105}
-
-cp -f %SOURCE1 pcsd/public/images
-
-mkdir -p pcsd/.bundle
-cp -f %SOURCE2 pcsd/.bundle/config
-
-mkdir -p pcsd/vendor/cache
-#copy ruby gems
-cp -f %SOURCE11 pcsd/vendor/cache
-cp -f %SOURCE12 pcsd/vendor/cache
-cp -f %SOURCE13 pcsd/vendor/cache
-cp -f %SOURCE14 pcsd/vendor/cache
-cp -f %SOURCE15 pcsd/vendor/cache
-cp -f %SOURCE16 pcsd/vendor/cache
-cp -f %SOURCE17 pcsd/vendor/cache
-cp -f %SOURCE18 pcsd/vendor/cache
-cp -f %SOURCE19 pcsd/vendor/cache
-cp -f %SOURCE20 pcsd/vendor/cache
-cp -f %SOURCE21 pcsd/vendor/cache
-cp -f %SOURCE22 pcsd/vendor/cache
-cp -f %SOURCE23 pcsd/vendor/cache
-#ruby gems copied
-
-mkdir -p %{bundled_lib_dir}
-tar -xzf %SOURCE41 -C %{bundled_lib_dir}
-mv %{bundled_lib_dir}/pyagentx-%{pyagentx_version} %{pyagentx_dir}
-cp %{pyagentx_dir}/LICENSE.txt pyagentx_LICENSE.txt
-cp %{pyagentx_dir}/CONTRIBUTORS.txt pyagentx_CONTRIBUTORS.txt
-cp %{pyagentx_dir}/README.md pyagentx_README.md
 
 %build
 
@@ -231,8 +87,8 @@ make install \
   PYTHON_SITELIB=%{python_sitelib} \
   PREFIX=%{PCS_PREFIX} \
   BASH_COMPLETION_DIR=$RPM_BUILD_ROOT/usr/share/bash-completion/completions \
-  PYAGENTX_DIR=`readlink -f %{pyagentx_dir}` \
-  SYSTEMCTL_OVERRIDE=true
+  SYSTEMCTL_OVERRIDE=true \
+  BUILD_GEMS=false
 
 #SYSTEMCTL_OVERRIDE enforces systemd to be used and skip autodetection
 make install_pcsd \
@@ -242,10 +98,8 @@ make install_pcsd \
   rubyhdrdir="%{_includedir}" \
   includedir="%{_includedir}" \
   PREFIX=%{PCS_PREFIX} \
-  SYSTEMCTL_OVERRIDE=true
-
-#after the ruby gem compilation we do not need ruby gems in the cache
-rm -r -v $RPM_BUILD_ROOT%{PCS_PREFIX}/lib/pcsd/vendor/cache
+  SYSTEMCTL_OVERRIDE=true \
+  BUILD_GEMS=false
 
 %check
 run_all_tests(){
@@ -253,138 +107,35 @@ run_all_tests(){
   sitelib=$RPM_BUILD_ROOT%{python_sitelib}
   pcsd_dir=$RPM_BUILD_ROOT%{PCS_PREFIX}/lib/pcsd
 
-  #run pcs tests and remove them, we do not distribute them in rpm
-  #python2-mock package is required but is only in epel so we will install it
-  #manually
-  #we do not have permissions to write anywhere else than $RPM_BUILD_ROOT
-  #so we must install python2-mock there
-  #test fail info:
-  #
-  # FAIL: test_base_create_with_agent_name_including_systemd_instance (pcs.test.cib_resource.test_create.Success)
-  #----------------------------------------------------------------------
-  #Traceback (most recent call last):
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.156-1.el7.x86_64/usr/lib/python2.7/site-packages/pcs/test/cib_resource/test_create.py", line 41, in test_base_create_with_agent_name_including_systemd_instance
-  #    </resources>"""
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.156-1.el7.x86_64/usr/lib/python2.7/site-packages/pcs/test/cib_resource/common.py", line 69, in assert_effect
-  #    self.assert_effect_single(alternative_list[-1], expected_xml, output)
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.156-1.el7.x86_64/usr/lib/python2.7/site-packages/pcs/test/cib_resource/common.py", line 56, in assert_effect_single
-  #    self.assert_pcs_success(command, output)
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.156-1.el7.x86_64/usr/lib/python2.7/site-packages/pcs/test/tools/assertions.py", line 51, in assert_pcs_success
-  #    stdout_start=stdout_start
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.156-1.el7.x86_64/usr/lib/python2.7/site-packages/pcs/test/tools/assertions.py", line 115, in assert_pcs_result
-  #    stdout=stdout
-  #AssertionError: Stdout is not as expected
-  #command: resource create R systemd:lvm2-pvscan@252:2 --no-default-ops --force
-  #diff is (expected is 2nd):
-  #- Warning: Agent 'systemd:lvm2-pvscan@252:2' is not installed or does not provide valid metadata: error: crm_abort: systemd_unit_exec: Triggered fatal assert at systemd.c:676 : systemd_init()
-  #Full stdout:
-  #Warning: Agent 'systemd:lvm2-pvscan@252:2' is not installed or does not provide valid metadata: error: crm_abort: systemd_unit_exec: Triggered fatal assert at systemd.c:676 : systemd_init()
-  #----------------------------------------------------------------------
-  # REASON: crm_resource ends with an error
-  ## cat /etc/redhat-release
-  #Red Hat Enterprise Linux Server release 7.4 Beta (Maipo)
-  ## crm_resource --show-metadata systemd:nonexistent@some:thingxxx
-  #error: crm_abort:  systemd_unit_exec: Triggered fatal assert at systemd.c:676 : systemd_init()
-  #
-  #**************************************************************
-  #
-  #pcs.lib.commands.test.test_stonith.Create.test_minimal_success
-  #--------------------------------------------------------------
-  #This tests fails only with live build on i686. Live build was tried twice.
-  #Architectures x86_64 and s390x succeeded, ppc64le was skipped with live
-  #build. Test succeeded with scratch build on i686.
-  #
-  #======================================================================
-  #ERROR: test_minimal_success (pcs.lib.commands.test.test_stonith.Create)
-  #----------------------------------------------------------------------
-  #Traceback (most recent call last):
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.162-3.el7.i386/usr/lib/python2.7/site-packages/pcs/lib/commands/test/test_stonith.py", line 71, in test_minimal_success
-  #    instance_attributes={"must-set": "value"}
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.162-3.el7.i386/usr/lib/python2.7/site-packages/pcs/lib/commands/stonith.py", line 77, in create
-  #    resource_type="stonith"
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.162-3.el7.i386/usr/lib/python2.7/site-packages/pcs/lib/cib/resource/primitive.py", line 78, in create
-  #    allow_invalid=allow_invalid_instance_attributes,
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.162-3.el7.i386/usr/lib/python2.7/site-packages/pcs/lib/resource_agent.py", line 871, in validate_parameters
-  #    update=update
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.162-3.el7.i386/usr/lib/python2.7/site-packages/pcs/lib/resource_agent.py", line 486, in validate_parameters
-  #    parameters
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.162-3.el7.i386/usr/lib/python2.7/site-packages/pcs/lib/resource_agent.py", line 518, in validate_parameters_values
-  #    agent_params = self.get_parameters()
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.162-3.el7.i386/usr/lib/python2.7/site-packages/pcs/lib/resource_agent.py", line 858, in get_parameters
-  #    self._get_stonithd_metadata().get_parameters()
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.162-3.el7.i386/usr/lib/python2.7/site-packages/pcs/lib/resource_agent.py", line 437, in get_parameters
-  #    params_element = self._get_metadata().find("parameters")
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.162-3.el7.i386/usr/lib/python2.7/site-packages/pcs/lib/resource_agent.py", line 596, in _get_metadata
-  #    self._metadata = self._parse_metadata(self._load_metadata())
-  #  File "/builddir/build/BUILDROOT/pcs-0.9.162-3.el7.i386/usr/lib/python2.7/site-packages/pcs/lib/resource_agent.py", line 668, in _load_metadata
-  #    [settings.stonithd_binary, "metadata"]
-  #ValueError: need more than 0 values to unpack
-
-  export PYTHONPATH="${PYTHONPATH}:${sitelib}"
-  easy_install -d ${sitelib} %SOURCE31
-  python ${sitelib}/pcs/test/suite.py -v --vanilla --all-but \
-    pcs.test.test_cluster.ClusterTest.testUIDGID \
-    pcs.test.test_stonith.StonithTest.test_stonith_create_provides_unfencing \
-    pcs.test.cib_resource.test_create.Success.test_base_create_with_agent_name_including_systemd_instance \
-    pcs.lib.commands.test.test_stonith.Create.test_minimal_success \
-    pcs.lib.commands.test.test_stonith.Create.test_minimal_wait_ok_run_ok \
-    pcs.lib.commands.test.test_stonith.CreateInGroup.test_minimal_success \
-    pcs.lib.commands.test.test_stonith.CreateInGroup.test_minimal_wait_ok_run_ok \
-
-  test_result_python=$?
-
   find ${sitelib}/pcs -name test -type d -print0|xargs -0 rm -r -v --
-  #we installed python2-mock inside $RPM_BUILD_ROOT and now we need to remove
-  #it because it does not belong into pcs package
-  #easy_install does not provide uninstall and pip is not an option (is in
-  #epel) so it must be cleaned manually
-  rm -v ${sitelib}/easy-install.pth
-  rm -v ${sitelib}/mock-1.0.1-py2.7.egg
-  rm -v ${sitelib}/site.py
-  rm -v ${sitelib}/site.pyc
 
-
-  #run pcsd tests and remove them
-  GEM_HOME=${pcsd_dir}/vendor/bundle/ruby ruby \
-    -I${pcsd_dir} \
-    -I${pcsd_dir}/test \
-    ${pcsd_dir}/test/test_all_suite.rb
-  test_result_ruby=$?
   #remove tests after use here to be symmetrical with pcs tests
   rm -r -v ${pcsd_dir}/test
-
-  if [ $test_result_python -ne 0 ]; then
-    return $test_result_python
-  fi
-  return $test_result_ruby
 }
 
 run_all_tests
 
+rm -f  $RPM_BUILD_ROOT/etc/sysconfig/pcs_snmp_agent
+rm -rf $RPM_BUILD_ROOT/usr/lib/pcs/bundled
+rm -f  $RPM_BUILD_ROOT/usr/lib/pcs/pcs_snmp_agent
+rm -f  $RPM_BUILD_ROOT/usr/lib/systemd/system/pcs_snmp_agent.service
+rm -f  $RPM_BUILD_ROOT/usr/share/man/man8/pcs_snmp_agent.8.gz
+rm -rf $RPM_BUILD_ROOT/usr/share/snmp
+
 %post
 %systemd_post pcsd.service
-
-%post -n %{pcs_snmp_pkg_name}
-%systemd_post pcs_snmp_agent.service
 
 %preun
 %systemd_preun pcsd.service
 
-%preun -n %{pcs_snmp_pkg_name}
-%systemd_preun pcs_snmp_agent.service
-
 %postun
 %systemd_postun_with_restart pcsd.service
-
-%postun -n %{pcs_snmp_pkg_name}
-%systemd_postun_with_restart pcs_snmp_agent.service
 
 %files
 %{python_sitelib}/pcs
 %{python_sitelib}/pcs-%{version}-py2.*.egg-info
 /usr/sbin/pcs
 /usr/lib/pcsd/*
-/usr/lib/pcsd/.bundle/config
 /usr/lib/systemd/system/pcsd.service
 /usr/share/bash-completion/completions/pcs
 /var/lib/pcsd
@@ -410,20 +161,7 @@ run_all_tests
 
 %doc COPYING
 %doc CHANGELOG.md
-
-%files -n %{pcs_snmp_pkg_name}
-/usr/lib/pcs/pcs_snmp_agent
-/usr/lib/pcs/bundled/packages/pyagentx*
-/usr/lib/systemd/system/pcs_snmp_agent.service
-/usr/share/snmp/mibs/PCMK-PCS*-MIB.txt
-%{_mandir}/man8/pcs_snmp_agent.*
-%config(noreplace) /etc/sysconfig/pcs_snmp_agent
-%dir /var/log/pcs
-%doc COPYING
-%doc CHANGELOG.md
-%doc pyagentx_LICENSE.txt
-%doc pyagentx_CONTRIBUTORS.txt
-%doc pyagentx_README.md
+%doc README.md
 
 %changelog
 * Wed Mar 21 2018 Ondrej Mular <omular@redhat.com> - 0.9.162-5.el7_5.1
