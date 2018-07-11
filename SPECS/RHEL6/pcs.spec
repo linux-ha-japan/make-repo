@@ -1,14 +1,106 @@
-Name: pcs		
-Version: 0.9.159
-Release: 1%{?dist}
+Name: pcs
+Version: 0.9.155
+Release: 3%{?dist}
 License: GPLv2
-URL: http://github.com/feist/pcs
+URL: https://github.com/ClusterLabs/pcs
 Group: System Environment/Base
 ExclusiveArch: i686 x86_64
-BuildRequires: python2-devel ruby-devel pam-devel
+
+Summary: Pacemaker Configuration System
+
+#part after last slash is recognized as filename in look-aside repository
+#desired name is achived by trick with hash anchor
+Source0: %{url}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1: pcsd-bundle-config-1
+
+Patch0: bz1397408-01-lib-check-for-minimal-version-when-upgrading-cib.patch
+Patch1: bz1394846-01-fix-adding-a-node-in-cman-clusters.patch
+Patch2: bz1394273-01-correct-handling-of-http-communication-failure.patch
+Patch3: rhel6.patch
+Patch4: change-cman-to-rhel6-in-messages.patch
+Patch5: fix-loading-fence-agents-metadata.patch
+Patch6: disable-gui.patch
+Patch7: ommit-rb-asserts-resulting-inconsistent-on-rhel6.patch
+Patch8: disable-booth-and-qdevice.patch
+Patch9: show-only-warning-when-crm_mon-xml-is-invalid.patch
+Patch10: bz1557962-01-get-rid-of-debug-when-calling-local-pcsd.patch
+
+Source11: https://rubygems.org/downloads/backports-3.6.8.gem
+Source12: https://rubygems.org/downloads/json-1.8.3.gem
+Source13: https://rubygems.org/downloads/multi_json-1.12.0.gem
+Source14: https://rubygems.org/downloads/open4-1.3.4.gem
+Source15: https://rubygems.org/downloads/orderedhash-0.0.6.gem
+Source16: https://rubygems.org/downloads/rack-protection-1.5.3.gem
+Source17: https://rubygems.org/downloads/rack-test-0.6.3.gem
+Source18: https://rubygems.org/downloads/rack-1.6.4.gem
+Source19: https://tojeline.fedorapeople.org/rubygems/gems/rpam-ruby19-feist-1.2.1.1.gem
+Source20: https://rubygems.org/downloads/sinatra-contrib-1.4.7.gem
+Source21: https://rubygems.org/downloads/sinatra-1.4.7.gem
+Source22: https://rubygems.org/downloads/tilt-2.0.3.gem
+
+#unittest2 0.5.1 is not the most new version, but was chosen because
+#1) is used in rhel6 rpm (epel)
+#2) have no extra dependencies (like newer version)
+Source30: http://pkgs.fedoraproject.org/repo/pkgs/python-unittest2/unittest2-0.5.1.tar.gz/a0af5cac92bbbfa0c3b0e99571390e0f/unittest2-0.5.1.tar.gz
+#mock 1.0.1 is taken from rhel7 - it works and contains all needed features
+Source31: https://github.com/testing-cabal/mock/archive/1.0.1.tar.gz#/mock-1.0.1.tar.gz
+
+# git for patches
+BuildRequires: git
+# python for pcs
+BuildRequires: python
+BuildRequires: python-devel
+BuildRequires: python-setuptools
+# gcc for compiling custom rubygems
+BuildRequires: gcc
+BuildRequires: gcc-c++
+# ruby and gems for pcsd
+BuildRequires: ruby
+BuildRequires: rubygems
+BuildRequires: ruby-devel
+# pam devel for compiling rubygem-rpam-ruby19
+BuildRequires: pam-devel
+# for UpdateTimestamps sanitization function
+BuildRequires: diffstat
+# for tests
+BuildRequires: corosync
+BuildRequires: pacemaker
+BuildRequires: pacemaker-cli
+BuildRequires: fence-agents
+BuildRequires: fence-virt
+BuildRequires: python-lxml
+BuildRequires: ccs
+
+# python and libraries for pcs, setuptools for pcs entrypoint
+Requires: python
+Requires: python-setuptools
+Requires: python-lxml
+# ruby and gems for pcsd
 Requires: ruby
-Summary: Pacemaker Configuration System	
-Source0: pcs-%{version}.tar.gz
+Requires: rubygems
+Requires: ccs
+# for killall
+Requires: psmisc
+# for working with certificates (validation etc.)
+Requires: openssl
+Requires: initscripts
+Requires: python-clufter >= 0.59.0
+# cman_tool is required for authentication, reloading cluster.conf, stopping cluster nodes
+Requires: cman
+
+Provides: bundled(rubygem-backports) = 3.6.8
+Provides: bundled(rubygem-json) = 1.8.3
+Provides: bundled(rubygem-multi_json) = 1.12.0
+Provides: bundled(rubygem-open4) = 1.3.4
+Provides: bundled(rubygem-orderedhash) = 0.0.6
+Provides: bundled(rubygem-rack) = 1.6.4
+Provides: bundled(rubygem-rack-protection) = 1.5.3
+Provides: bundled(rubygem-rack-test) = 0.6.3
+Provides: bundled(rubygem-rpam-ruby19) = 1.2.1
+Provides: bundled(rubygem-sinatra) = 1.4.7
+Provides: bundled(rubygem-sinatra-contrib) = 1.4.7
+Provides: bundled(rubygem-tilt) = 2.0.3
+
 
 %description
 pcs is a corosync and pacemaker configuration tool.  It permits users to
@@ -17,14 +109,174 @@ easily view, modify and created pacemaker based clusters.
 %prep
 %setup -q
 
+# -- following borrowed from python-simplejon.el5 --
+# Update timestamps on the files touched by a patch, to avoid non-equal
+# .pyc/.pyo files across the multilib peers within a build, where "Level"
+# is the patch prefix option (e.g. -p1)
+UpdateTimestamps() {
+  Level=$1
+  PatchFile=$2
+  # Locate the affected files:
+  for f in $(diffstat $Level -l $PatchFile); do
+    # Set the files to have the same timestamp as that of the patch:
+    touch -r $PatchFile $f
+  done
+}
+
+%patch0 -p1
+UpdateTimestamps -p1 %{PATCH0}
+%patch1 -p1
+UpdateTimestamps -p1 %{PATCH1}
+%patch2 -p1
+UpdateTimestamps -p1 %{PATCH2}
+%patch3 -p1
+UpdateTimestamps -p1 %{PATCH3}
+%patch4 -p1
+UpdateTimestamps -p1 %{PATCH4}
+%patch5 -p1
+UpdateTimestamps -p1 %{PATCH5}
+%patch6 -p1
+UpdateTimestamps -p1 %{PATCH6}
+%patch7 -p1
+UpdateTimestamps -p1 %{PATCH7}
+%patch8 -p1
+UpdateTimestamps -p1 %{PATCH8}
+%patch9 -p1
+UpdateTimestamps -p1 %{PATCH9}
+%patch10 -p1
+UpdateTimestamps -p1 %{PATCH10}
+
+mkdir -p pcsd/.bundle
+cp -f %SOURCE1 pcsd/.bundle/config
+
+mkdir -p pcsd/vendor/cache
+#copy ruby gems
+cp -f %SOURCE11 pcsd/vendor/cache
+cp -f %SOURCE12 pcsd/vendor/cache
+cp -f %SOURCE13 pcsd/vendor/cache
+cp -f %SOURCE14 pcsd/vendor/cache
+cp -f %SOURCE15 pcsd/vendor/cache
+cp -f %SOURCE16 pcsd/vendor/cache
+cp -f %SOURCE17 pcsd/vendor/cache
+cp -f %SOURCE18 pcsd/vendor/cache
+cp -f %SOURCE19 pcsd/vendor/cache
+cp -f %SOURCE20 pcsd/vendor/cache
+cp -f %SOURCE21 pcsd/vendor/cache
+cp -f %SOURCE22 pcsd/vendor/cache
+#ruby gems copied
+
 %build
 
+%define PCS_PREFIX /usr
 %install
 rm -rf $RPM_BUILD_ROOT
-export BUILD_GEMS=false
-make install DESTDIR=$RPM_BUILD_ROOT PYTHON_SITELIB=%{python_sitelib}
-make install_pcsd DESTDIR=$RPM_BUILD_ROOT PYTHON_SITELIB=%{python_sitelib} hdrdir="%{_includedir}" rubyhdrdir="%{_includedir}" includedir="%{_includedir}" initdir="%{_initrddir}"
-chmod 755 $RPM_BUILD_ROOT/%{python_sitelib}/pcs/app.py
+make install \
+  DESTDIR=$RPM_BUILD_ROOT \
+  PYTHON_SITELIB=%{python_sitelib} \
+  PREFIX=%{PCS_PREFIX} \
+  BASH_COMPLETION_DIR=$RPM_BUILD_ROOT/etc/bash_completion.d
+make install_pcsd \
+  DESTDIR=$RPM_BUILD_ROOT \
+  PYTHON_SITELIB=%{python_sitelib} \
+  hdrdir="%{_includedir}" \
+  rubyhdrdir="%{_includedir}" \
+  includedir="%{_includedir}" \
+  initdir="%{_initrddir}" \
+  PREFIX=%{PCS_PREFIX}
+
+%check
+run_all_tests(){
+  #prepare environmet for tests
+  sitelib=$RPM_BUILD_ROOT%{python_sitelib}
+  pcsd_dir=$RPM_BUILD_ROOT%{PCS_PREFIX}/lib/pcsd
+  export PYTHONPATH="${PYTHONPATH}:${sitelib}"
+
+  #run pcs tests and remove them, we do not distribute them in rpm
+
+  # disabled tests:
+  #
+  # pcs.test.test_cluster.ClusterTest.testUIDGID
+  #   touches live cluster configuration, cannot run in mock environment
+  #
+  # pcs.lib.booth.test.test_env.SetKeyfileAccessTest.test_set_desired_file_access
+  #   touches live cluster configuration, test need to be fixed
+  #   Traceback (most recent call last):
+  #     File "/builddir/build/BUILDROOT/pcs-0.9.152-6.el7.x86_64/usr/lib/python2.7/site-packages/pcs/lib/booth/test/test_env.py", line 148, in test_set_desired_file_access
+  #       env.set_keyfile_access(file_path)
+  #     File "/builddir/build/BUILDROOT/pcs-0.9.152-6.el7.x86_64/usr/lib/python2.7/site-packages/pcs/lib/booth/env.py", line 63, in set_keyfile_access
+  #       raise report_keyfile_io_error(file_path, "chown", e)
+  #   LibraryError: ERROR FILE_IO_ERROR: {u'reason': u"Operation not permitted: '/builddir/build/BUILDROOT/pcs-0.9.152-6.el7.x86_64/usr/lib/python2.7/site-packages/pcs/test/resources/temp-keyfile'", u'file_role': u'BOOTH_KEY', u'file_path': u'/builddir/build/BUILDROOT/pcs-0.9.152-6.el7.x86_64/usr/lib/python2.7/site-packages/pcs/test/resources/temp-keyfile', u'operation': u'chown'}
+  #
+  # pcs.test.test_resource.ResourceTest.testAddResources
+  # when new pacemaker build will be there this should work
+  #
+  #Traceback (most recent call last):
+  #  File "/builddir/build/BUILDROOT/pcs-0.9.154-1.el6.x86_64/usr/lib/python2.6/site-packages/pcs/test/test_resource.py", line 228, in testAddResources
+  #    """)
+  #  File "/builddir/build/BUILDROOT/pcs-0.9.154-1.el6.x86_64/usr/lib/python2.6/site-packages/pcs/test/tools/misc.py", line 32, in ac
+  #    "strings not equal:\n{0}".format(prepare_diff(b, a))
+  #AssertionError: strings not equal:
+  #   ClusterIP  (ocf::heartbeat:IPaddr2): Stopped
+  #   ClusterIP2 (ocf::heartbeat:IPaddr2): Stopped
+  #   ClusterIP3 (ocf::heartbeat:IPaddr2): Stopped
+  #   ClusterIP4 (ocf::heartbeat:IPaddr2): Stopped
+  #   ClusterIP5 (ocf::heartbeat:IPaddr2): Stopped
+  #   ClusterIP6 (ocf::heartbeat:IPaddr2): Stopped
+  #-  ClusterIP7 (ocf::heartbeat:IPaddr2): Stopped (disabled)
+  #?                                               ^^^^^^^  -
+  #+  ClusterIP7 (ocf::heartbeat:IPaddr2): (target-role:Stopped) Stopped
+  #?                                       +++++++++++++       + ^^^^^
+
+  easy_install -d ${sitelib} %SOURCE30
+  easy_install -d ${sitelib} %SOURCE31
+  python ${sitelib}/pcs/test/suite.py -v --vanilla --all-but \
+    pcs.test.test_cluster.ClusterTest.testUIDGID \
+    pcs.lib.booth.test.test_env.SetKeyfileAccessTest.test_set_desired_file_access \
+    pcs.test.test_resource.ResourceTest.testAddResources \
+
+
+  test_result_python=$?
+
+  #remove pcs tests, we do not distribute them in rpm
+  #
+  #Problem with removing ${sitelib}/pcs/test/tools/test appeared:
+  #There is ${sitelib}/pcs/test before ${sitelib}/pcs/test/tools/test in 
+  #the find result. It fails because ${sitelib}/pcs/test/tools/test does not
+  #exists during removing.
+  #Temporary solution is remove ${sitelib}/pcs/test before find command.
+  rm -r -v ${sitelib}/pcs/test
+  find ${sitelib}/pcs -name test -type d -print0|xargs -0 rm -r -v --
+  #we installed python2-mock inside $RPM_BUILD_ROOT and now we need to remove
+  #it because it does not belong into pcs package
+  #easy_install does not provide uninstall and pip is not an option (is in
+  #epel) so it must be cleaned manually
+  rm -Rv ${sitelib}/mock-1.0.1-py2.6.egg/
+  rm -v ${sitelib}/site.py
+  rm -v ${sitelib}/site.pyc
+  rm -v ${sitelib}/unit2
+  rm -v ${sitelib}/unit2-2.6
+  rm -v ${sitelib}/unit2.py
+  rm -Rv ${sitelib}/unittest2-0.5.1-py2.6.egg/
+  rm -v ${sitelib}/easy-install.pth
+
+
+  # run pcsd tests and remove them
+  GEM_HOME=${pcsd_dir}/vendor/bundle/ruby ruby \
+    -I${pcsd_dir} \
+    -I${pcsd_dir}/test \
+    ${pcsd_dir}/test/test_all_suite.rb
+  test_result_ruby=$?
+
+  #remove pcsd tests, we do not distribute them in rpm
+  rm -r -v ${pcsd_dir}/test
+
+  if [ $test_result_python -ne 0 ]; then
+    return $test_result_python
+  fi
+  return $test_result_ruby
+}
+
+run_all_tests
 
 %post
 /sbin/chkconfig --add pcsd
@@ -44,19 +296,126 @@ fi
 %{python_sitelib}/pcs-%{version}-py2.*.egg-info
 /usr/sbin/pcs
 /usr/lib/pcsd/*
+/usr/lib/pcsd/.bundle/config
 %{_initrddir}/pcsd
 /var/lib/pcsd
 /etc/pam.d/pcsd
 /etc/bash_completion.d/pcs
 /etc/logrotate.d/pcsd
 %dir /var/log/pcsd
-/etc/sysconfig/pcsd
+%config(noreplace) /etc/sysconfig/pcsd
+%ghost %attr(0700, -, -) %config(noreplace) /var/lib/pcsd/pcsd.cookiesecret
+%ghost %attr(0700, -, -) %config(noreplace) /var/lib/pcsd/pcsd.crt
+%ghost %attr(0700, -, -) %config(noreplace) /var/lib/pcsd/pcsd.key
+%ghost %attr(0644, -, -) %config(noreplace) /var/lib/pcsd/pcs_settings.conf
+%ghost %attr(0644, -, -) %config(noreplace) /var/lib/pcsd/pcs_users.conf
+%ghost %attr(0600, -, -) %config(noreplace) /var/lib/pcsd/cfgsync_ctl
+%ghost %attr(0600, -, -) %config(noreplace) /var/lib/pcsd/tokens
 %{_mandir}/man8/pcs.*
-%{_mandir}/man8/pcsd.*
+%exclude /usr/lib/pcsd/*.debian
+%exclude /usr/lib/pcsd/pcsd.service
+%exclude /usr/lib/pcsd/pcsd.conf
+%exclude %{python_sitelib}/pcs/bash_completion.sh
+%exclude %{python_sitelib}/pcs/pcs.8
+%exclude %{python_sitelib}/pcs/pcs
 
 %doc COPYING README
 
 %changelog
+* Wed Mar 21 2018 Ondrej Mular <omular@redhat.com> - 0.9.155-3
+- Fixed CVE-2018-1086 pcs: Debug parameter removal bypass, allowing information disclosure
+- Resolves: rhbz#1557962
+
+* Wed Nov 23 2016 Ivan Devat <idevat@redhat.com> - 0.9.155-2
+- Fixed upgrading CIB to the latest schema version
+- Adding a node in a cluster does not cause the new node to be fenced immediately
+- Fixed handling of HTTP communication failure
+- Added dependency on cman
+- Resolves: rhbz#1397408 rhbz#1394846 rhbz#1394273 rhbz#1394857
+
+* Thu Nov 03 2016 Ivan Devat <idevat@redhat.com> - 0.9.155-1
+- Rebased to latest upstream packages
+- When stopping a cluster with some of the nodes unreachable, stop the cluster completely on all reachable nodes
+- Fixed occasional crashes / failures when using locale other than en_US.UTF8
+- Added SBD support for cman clusters
+- Added alerts management in web UI
+- Resolves: rhbz#1373874 rhbz#1315748 rhbz#1380372 rhbz#1387106 rhbz#1380352 rhbz#1376480
+
+* Fri Oct 14 2016 Ivan Devat <idevat@redhat.com> - 0.9.154-1
+- Rebased to latest upstream packages
+- Keep a cluster qauorate as long as possible when shutting it down
+- Fixed disabling TLSv1.1 in pcsd
+- Fixed error message in node maintenance/unmaintenance commands
+- Fixed adding a node when fencing configuration has been manually changed in cluster.conf
+- Make pcsd init script wait for pcsd to fully start
+- Gracefully handle errors when reading cluster properties definition
+- Resolves: rhbz#1373874 rhbz#1353738 rhbz#1344928 rhbz#1369029 rhbz#1319070 rhbz#1328870 rhbz#1325459
+
+* Mon Jul 18 2016 Tomas Jelinek <tojeline@redhat.com> - 0.9.148-7.el6_8.1
+- Fixed coordinated stopping of cluster nodes
+- Resolves: rhbz#1353738
+
+* Tue Mar 22 2016 Ivan Devat <idevat@redhat.com> - 0.9.148-7
+- Fixed handling permission config file corner cases
+- Resolves: rhbz#1317812
+
+* Fri Mar 18 2016 Ivan Devat <idevat@redhat.com> - 0.9.148-6
+- Added config settings for SSL options and ciphers
+- Resolves: rhbz#1317812
+
+* Wed Feb 24 2016 Ivan Devat <idevat@redhat.com> - 0.9.148-5
+- Fixed incorrect default permission assignment in pcsd.
+- Resolves: rhbz#1311159
+
+* Wed Feb 17 2016 Ivan Devat <idevat@redhat.com> - 0.9.148-4
+- Fixed occasional deadlock when running processes
+- Resolves: rhbz#1305913
+
+* Tue Feb 02 2016 Ivan Devat <idevat@redhat.com> - 0.9.148-3
+- Fixed updating cluster properties from older version of web UI
+- Fixed syntax error in utilization attributes functions
+- Resolves: rhbz#1298163
+- Related: rhbz#1260021
+
+* Tue Jan 19 2016 Ivan Devat <idevat@redhat.com> - 0.9.148-2
+- Moved DISABLED_GUI option to /etc/sysconfig/pcsd
+- Added backend support for new cluster properties form in web UI
+- Fixed multilib .pyc/.pyo issue
+- Resolves: rhbz#1297782 rhbz#1298163
+
+* Wed Dec 09 2015 Tomas Jelinek <tojeline@redhat.com> - 0.9.148-1
+- Rebased to latest upstream packages
+- Fixed crashes on one-node clusters
+- Resolves: rhbz#1260021 rhbz#1283627
+
+* Thu Nov 05 2015 Tomas Jelinek <tojeline@redhat.com> - 0.9.146-1
+- Rebased to latest upstream packages
+- Rubygems built with RELRO
+- Resolves: rhbz#1260021 rhbz#1242158
+
+* Thu Nov 05 2015 Tomas Jelinek <tojeline@redhat.com> - 0.9.145-2
+- Rubygems built with RELRO
+- Resolves: rhbz#1242158
+
+* Thu Oct 22 2015 Tomas Jelinek <tojeline@redhat.com> - 0.9.145-1
+- Rebased to latest upstream packages
+- Added a warning to "pcs cluster setup" when a node is already in a cluster
+- Fixes in help text and man page
+- Rubygems built with RELRO
+- Added option to put a node into maintenance mode
+- Ungrouping the last resource from a cloned group no longer produces an invalid CIB
+- Removing a resource from a group no longer removes constraints referencing that group
+- Fixed session and cookies processing
+- Fixed command injection vulnerability
+- Added support for exporting cluster configuration to a list of pcs commands using clufter
+- Added automatic removal of old config file backups
+- Fixed removing a fence device from fence levels on deleting the device
+- Resolves: rhbz#1260021 rhbz#1190732 rhbz#1203802 rhbz#1230368 rhbz#1242158 rhbz#1243744 rhbz#1245721 rhbz#1247883 rhbz#1247979 rhbz#1253288 rhbz#1253292 rhbz#1264795 rhbz#1273391 rhbz#1275254
+
+* Tue Apr 14 2015 Chris Feist <cfeist@redhat.com> - 0.9.139-9
+- Added fix for missing cookie signature
+- Resolves: rhbz#1211566
+
 * Fri Apr 03 2015 Tomas Jelinek <tojeline@redhat.com> - 0.9.139-8
 - Fixed duplicated nodes in a cluster created by import-cman
 - Resolves: rhbz#1171312
