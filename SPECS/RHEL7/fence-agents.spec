@@ -15,7 +15,7 @@
 
 Name: fence-agents
 Summary: Fence Agents for Red Hat Cluster
-Version: 4.2.1
+Version: 4.3.3
 Release: 1%{?alphatag:.%{alphatag}}%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
@@ -458,6 +458,8 @@ The fence-agents-ilo-ssh package contains a fence agent for HP iLO devices that 
 %{_mandir}/man8/fence_ilo3_ssh.8*
 %{_sbindir}/fence_ilo4_ssh
 %{_mandir}/man8/fence_ilo4_ssh.8*
+%{_sbindir}/fence_ilo5_ssh
+%{_mandir}/man8/fence_ilo5_ssh.8*
 
 %package intelmodular
 License: GPLv2+ and LGPLv2+
@@ -506,6 +508,8 @@ The fence-agents-ipmilan package contains a fence agent for devices with IPMI in
 %{_mandir}/man8/fence_ilo3.8*
 %{_sbindir}/fence_ilo4
 %{_mandir}/man8/fence_ilo4.8*
+%{_sbindir}/fence_ilo5
+%{_mandir}/man8/fence_ilo5.8*
 %{_sbindir}/fence_imm
 %{_mandir}/man8/fence_imm.8*
 
