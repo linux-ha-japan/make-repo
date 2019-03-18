@@ -100,6 +100,11 @@ END
 %description
 This package collects required packages as pacemaker-all.
 
+%post
+%if 0%{?rhel} >= 7
+    systemctl try-restart NetworkManager.service
+%endif
+
 %files
 
 %changelog
