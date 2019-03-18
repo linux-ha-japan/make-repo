@@ -73,7 +73,7 @@ Release: ${rpm_release}%{?dist}
 Summary: pacemaker and recommended toolset
 Group: Environment/Daemons
 License: GPL
-URL: http://osdn.jp/projects/linux-ha/
+URL: https://ja.osdn.net/projects/linux-ha/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
 
@@ -122,7 +122,7 @@ Release: ${rpm_release}%{?dist}
 Summary: Packages for High-Availability Linux
 Group: System Environment/Base
 License: GPL
-URL: http://osdn.jp/projects/linux-ha/
+URL: https://ja.osdn.net/projects/linux-ha/
 Source0: %{name}-%{version}-%{release}.%{_arch}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -295,7 +295,7 @@ Release: ${rpm_release}%{?dist}
 Summary: Debuginfo Packages for High-Availability Linux
 Group: System Environment/Base
 License: GPL
-URL: http://osdn.jp/projects/linux-ha/
+URL: https://ja.osdn.net/projects/linux-ha/
 Source0: %{name}-%{version}-%{release}.%{_arch}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -413,7 +413,7 @@ Release: ${rpm_release}%{?dist}
 Summary: Source Packages for High-Availability Linux
 Group: System Environment/Base
 License: GPL
-URL: http://osdn.jp/projects/linux-ha/
+URL: https://ja.osdn.net/projects/linux-ha/
 Source0: %{name}-%{version}-%{release}.%{_arch}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
