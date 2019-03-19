@@ -1,12 +1,12 @@
 Name: pcs
-Version: 0.9.165
+Version: 0.9.166
 Release: 1%{?dist}
 License: GPLv2
 URL: https://github.com/ClusterLabs/pcs
 Group: System Environment/Base
 Summary: Pacemaker Configuration System
 #building only for architectures with pacemaker and corosync available
-ExclusiveArch: i686 x86_64 s390x ppc64le
+ExclusiveArch: i686 x86_64 s390x ppc64le aarch64
 
 
 #part after last slash is recognized as filename in look-aside repository
@@ -164,6 +164,42 @@ rm -rf $RPM_BUILD_ROOT/usr/share/snmp
 %doc README.md
 
 %changelog
+* Fri Aug 31 2018 Ondrej Mular <omular@redhat.com> - 0.9.165-6
+- Fix instance attributes setting for fence agents `fence_compute` and
+  `fence_evacuate`
+- Resolves: rhbz#1623181
+
+* Tue Aug 28 2018 Ondrej Mular <omular@redhat.com> - 0.9.165-5
+- Fixed `pcs stonith sbd watchdog test` error messages
+- Fixed avaliable watchdog devices listing
+- Resolves: rhbz#1475318
+
+* Thu Aug 16 2018 Ondrej Mular <omular@redhat.com> - 0.9.165-4
+- Fixed `pcs cluster cib-push` for old crm_feature_set
+- Resolves: rhbz#1488044
+
+* Mon Aug 06 2018 Ivan Devat <idevat@redhat.com> - 0.9.165-3
+- Fixed unhandled exception during a start support check
+- Resolves: rhbz#1572886
+
+* Mon Jul 23 2018 Ivan Devat <idevat@redhat.com> - 0.9.165-2
+- Fixed validation for an unaccessible resource inside a bundle 
+- Fixed test of watchdog devices
+- Fixed command `pcs cluster node add-outside`
+- Fixed large key files distribution
+- Resolves: rhbz#1462248 rhbz#1475318 rhbz#1599758 rhbz#1600169
+
+* Fri Jun 22 2018 Ivan Devat <idevat@redhat.com> - 0.9.165-1
+- Rebased to latest upstream sources (see CHANGELOG.md)
+- Resolves: rhbz#1572886 rhbz#1581150 rhbz#1579911 rhbz#1533849 rhbz#1557252 rhbz#1568353 rhbz#1574898 rhbz#1427273 rhbz#1475318 rhbz#1476862 rhbz#1535967 rhbz#1566382 rhbz#1588667 rhbz#1590533 rhbz#1403832 rhbz#1517333 rhbz#1529508 
+
+* Fri Apr 27 2018 Ivan Devat <idevat@redhat.com> - 0.9.162-7
+- Fixed license tag in specfile
+
+* Fri Apr 27 2018 Ivan Devat <idevat@redhat.com> - 0.9.162-6
+- Added aarch64
+- Resolves: rhbz#1568291
+
 * Wed Mar 21 2018 Ondrej Mular <omular@redhat.com> - 0.9.162-5.el7_5.1
 - Fixed CVE-2018-1086 pcs: Debug parameter removal bypass, allowing information disclosure
 - Fixed CVE-2018-1079 pcs: Privilege escalation via authorized user malicious REST call
