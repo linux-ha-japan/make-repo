@@ -13,115 +13,19 @@
 # keep around ready for later user
 ## global alphatag git0a6184070
 
-%global bundled_lib_dir    bundled
-
-# google cloud
-# python-google-api-client bundle
-%global googleapiclient		google-api-python-client
-%global googleapiclient_version	1.6.3
-%global googleapiclient_dir	%{bundled_lib_dir}/gce/%{googleapiclient}
-# python-oauth2client bundle
-%global oauth2client		oauth2client
-%global oauth2client_version	4.0.0
-%global oauth2client_dir	%{bundled_lib_dir}/gce/%{oauth2client}
-# python-httplib2 bundle
-%global httplib2		httplib2
-%global httplib2_version	0.9.1
-%global httplib2_dir		%{bundled_lib_dir}/gce/%{httplib2}
-# python-fasteners bundle
-%global fasteners		fasteners
-%global fasteners_version	0.9.0
-%global fasteners_dir		%{bundled_lib_dir}/gce/%{fasteners}
-# python-keyring bundle
-%global keyring			keyring
-%global keyring_version		5.0
-%global keyring_dir		%{bundled_lib_dir}/gce/%{keyring}
-# python-gflags bundle
-%global gflags			gflags
-%global gflags_version		2.0
-%global gflags_dir		%{bundled_lib_dir}/gce/%{gflags}
-# python-uritemplate bundle
-%global uritemplate		uritemplate
-%global uritemplate_version	3.0.0
-%global uritemplate_dir		%{bundled_lib_dir}/gce/%{uritemplate}
-
-# alibaba
-# python-pycryptodome bundle
-%global pycryptodome		pycryptodome
-%global pycryptodome_version	3.6.4
-%global pycryptodome_dir	%{bundled_lib_dir}/aliyun/%{pycryptodome}
-# python-aliyun-sdk-core bundle
-%global aliyunsdkcore		aliyun-python-sdk-core
-%global aliyunsdkcore_version	2.8.5
-%global aliyunsdkcore_dir	%{bundled_lib_dir}/aliyun/%{aliyunsdkcore}
-# python-aliyun-sdk-ecs bundle
-%global aliyunsdkecs		aliyun-python-sdk-ecs
-%global aliyunsdkecs_version	4.9.3
-%global aliyunsdkecs_dir	%{bundled_lib_dir}/aliyun/%{aliyunsdkecs}
-# python-aliyun-sdk-vpc bundle
-%global aliyunsdkvpc		aliyun-python-sdk-vpc
-%global aliyunsdkvpc_version	3.0.2
-%global aliyunsdkvpc_dir	%{bundled_lib_dir}/aliyun/%{aliyunsdkvpc}
-
 Name: fence-agents
 Summary: Fence Agents for Red Hat Cluster
-Version: 4.2.1
-Release: 11%{?alphatag:.%{alphatag}}%{?dist}.8
+Version: 4.4.0
+Release: 1%{?alphatag:.%{alphatag}}%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
 URL: https://github.com/ClusterLabs/fence-agents
-Source0: https://fedorahosted.org/releases/f/e/fence-agents/%{name}-%{version}.tar.gz
-Source1: https://pypi.python.org/packages/16/00/a6913a2e6eb3d5b1cc3538c3492ccd2b39a6d79367432d46cea1ec74170d/%{googleapiclient}-%{googleapiclient_version}.tar.gz
-Source2: https://github.com/google/%{oauth2client}/archive/v%{oauth2client_version}.tar.gz#/%{oauth2client}-%{oauth2client_version}.tar.gz
-Source3: https://pypi.python.org/packages/source/h/%{httplib2}/%{httplib2}-%{httplib2_version}.tar.gz
-Source4: https://codeload.github.com/harlowja/fasteners/tar.gz/%{fasteners_version}#/%{fasteners}-%{fasteners_version}.tar.gz
-Source5: http://pypi.python.org/packages/source/k/keyring/%{keyring}-%{keyring_version}.zip
-Source6: https://github.com/gflags/python-gflags/archive/python-%{gflags}-%{gflags_version}.tar.gz#/python-%{gflags}-%{gflags_version}.tar.gz
-Source7: https://github.com/sigmavirus24/%{uritemplate}/archive/%{uritemplate_version}/%{uritemplate}-%{uritemplate_version}.tar.gz
-Source8: %{pycryptodome}-%{pycryptodome_version}.tar.gz
-Source9: %{aliyunsdkcore}-%{aliyunsdkcore_version}.tar.gz
-Source10: %{aliyunsdkecs}-%{aliyunsdkecs_version}.tar.gz
-Source11: %{aliyunsdkvpc}-%{aliyunsdkvpc_version}.tar.gz
-Patch0: bz1579391-fence_impilan-fence_ilo_ssh-add-ilo5-support.patch
-Patch1: bz1504202-fence_mpath-watchdog-support.patch
-Patch2: bz1236395-1-fence_scsi-fence_scsi_check.pl-link.patch
-Patch3: bz1236395-2-fence_ilo3-fence_ipmilan-show-correct-default-method.patch
-Patch4: bz1549699-1-fence_evacuate-fix-evacuable-tag-mix-issue.patch
-Patch5: bz1549699-2-fence_compute-fence_evacuate-fix-compute-domain.patch
-Patch6: bz1568753-1-fence_gce-stackdriver-logging-default-method-cycle.patch
-Patch7: bz1568753-2-fence_gce-filter-aggregatedlist.patch
-Patch8: bz1568753-3-fence_gce-stackdriver-logging-note.patch
-Patch9: bz1568742-1-fence_aliyun.patch
-Patch10: bz1568742-2-fence_aliyun.patch
-Patch11: bz1568742-3-fence_aliyun-logging.patch
-Patch12: bz1568742-4-fence_aliyun-bundled.patch
-Patch13: bz1236395-3-fix-version.patch
-Patch14: bz1622229-1-fence_aliyun-list-instance-names.patch
-Patch15: bz1622229-2-fence_aliyun-correct-help-indentation.patch
-Patch16: bz1625164-fence_cisco_ucs-encode-POSTFIELDS.patch
-Patch17: bz1647522-fence_scsi-fix-incorrect-SCSI-key-node-ID-10-or-higher.patch
-Patch18: bz1654172-1-fence_scsi-watchdog-retry-support.patch
-Patch19: bz1654172-2-build-fix-check_used_options.patch
-Patch20: bz1652115-fence_hpblade-fix-log_expect-syntax.patch
-Patch21: bz1666848-1-fence_redfish.patch
-Patch22: bz1666848-2-fence_redfish-fail-invalid-cert.patch
-Patch23: bz1708547-fence_rhevm-RHEV-v4-API-support.patch
-Patch24: bz1709110-fence_azure_arm-skip_shutdown.patch
-# bundle patches
-Patch1000: bz1568753-4-fence_gce-bundled-libs.patch
-Patch1001: bz1568753-5-%{oauth2client}-docs-build-fix.patch
-Patch1002: bz1568753-6-%{oauth2client}-python-rsa-to-cryptography.patch
-Patch1003: python-%{httplib2}.certfile.patch
-Patch1004: python-%{httplib2}.getCertHost.patch
-Patch1005: python-%{httplib2}.rfc2459.patch
-Patch1006: python-%{httplib2}-0.9-proxy-http.patch
-Patch1007: python-%{httplib2}-0.9-cve-2013-2037.patch
-Patch1008: bz1568753-7-%{keyring}-fix-gnome-version-warning.patch
+Source0: fence-agents/%{name}-%{version}.tar.xz
 
 %if 0%{?rhel}
-%global supportedagents amt_ws apc apc_snmp bladecenter brocade cisco_mds cisco_ucs compute drac5 eaton_snmp emerson eps evacuate hpblade ibmblade ifmib ilo ilo_moonshot ilo_mp ilo_ssh intelmodular ipdu ipmilan mpath kdump redfish rhevm rsa rsb sbd scsi vmware_rest vmware_soap wti
+%global supportedagents amt_ws apc apc_snmp bladecenter brocade cisco_mds cisco_ucs compute drac5 eaton_snmp emerson eps evacuate hpblade ibmblade ifmib ilo ilo_moonshot ilo_mp ilo_ssh intelmodular ipdu ipmilan mpath kdump redfish rhevm rsa rsb sbd scsi vmware_rest vmware_soap wti docker vbox
 %ifarch x86_64
-%global testagents virsh heuristics_ping aliyun aws azure_arm gce
+%global testagents virsh heuristics_ping aws azure_arm
 %endif
 %ifarch ppc64le
 %global testagents virsh lpar heuristics_ping
@@ -149,292 +53,17 @@ BuildRequires: net-snmp-utils
 BuildRequires: autoconf automake libtool
 BuildRequires: iputils
 
-# python-google-api-client bundle
-BuildRequires:  python-devel >= 2.7
-BuildRequires:  python-setuptools
-BuildRequires:  python-six >= 1.6.1
-
 %prep
 %setup -q -n %{name}-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1 -F2
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
-%patch15 -p1
-%patch16 -p1
-%patch17 -p1
-%patch18 -p1
-%patch19 -p1
-%patch20 -p1
-%patch21 -p1
-%patch22 -p1
-%patch23 -p1 -F2
-%patch24 -p1
-
-%ifarch x86_64
-# bundles
-mkdir -p %{bundled_lib_dir}/aliyun
-mkdir -p %{bundled_lib_dir}/gce
-
-# python-google-api-client bundle
-tar -xzf %SOURCE1 -C %{bundled_lib_dir}
-mv %{bundled_lib_dir}/%{googleapiclient}-%{googleapiclient_version} %{googleapiclient_dir}
-cp %{googleapiclient_dir}/LICENSE %{googleapiclient}_LICENSE
-
-# python-oauth2client bundle
-tar -xzf %SOURCE2 -C %{bundled_lib_dir}
-mv %{bundled_lib_dir}/%{oauth2client}-%{oauth2client_version} %{oauth2client_dir}
-cp %{oauth2client_dir}/LICENSE %{oauth2client}_LICENSE
-cp %{oauth2client_dir}/README.md %{oauth2client}_README.md
-
-# python-httplib2 bundle
-tar -xzf %SOURCE3 -C %{bundled_lib_dir}
-mv %{bundled_lib_dir}/%{httplib2}-%{httplib2_version} %{httplib2_dir}
-
-# python-fasteners bundle
-tar -xzf %SOURCE4 -C %{bundled_lib_dir}
-mv %{bundled_lib_dir}/%{fasteners}-%{fasteners_version} %{fasteners_dir}
-cp %{fasteners_dir}/LICENSE %{fasteners}_LICENSE
-cp %{fasteners_dir}/README.rst %{fasteners}_README.rst
-
-# python-keyring bundle
-unzip %SOURCE5 -d %{bundled_lib_dir}
-mv %{bundled_lib_dir}/%{keyring}-%{keyring_version} %{keyring_dir}
-cp %{keyring_dir}/README.rst %{keyring}_README.rst
-
-# python-gflags bundle
-tar -xzf %SOURCE6 -C %{bundled_lib_dir}
-mv %{bundled_lib_dir}/python-%{gflags}-%{gflags_version} %{gflags_dir}
-cp %{gflags_dir}/README %{gflags}_README
-
-# python-uritemplate bundle
-tar -xzf %SOURCE7 -C %{bundled_lib_dir}
-mv %{bundled_lib_dir}/%{uritemplate}-%{uritemplate_version} %{uritemplate_dir}
-cp %{uritemplate_dir}/LICENSE %{uritemplate}_LICENSE
-cp %{uritemplate_dir}/LICENSE.APACHE %{uritemplate}_LICENSE.APACHE
-cp %{uritemplate_dir}/LICENSE.BSD %{uritemplate}_LICENSE.BSD
-cp %{uritemplate_dir}/README.rst %{uritemplate}_README.rst
-
-# python-pycryptodome bundle
-tar -xzf %SOURCE8 -C %{bundled_lib_dir}
-mv %{bundled_lib_dir}/%{pycryptodome}-%{pycryptodome_version} %{pycryptodome_dir}
-cp %{pycryptodome_dir}/README.rst %{pycryptodome}_README.rst
-cp %{pycryptodome_dir}/LICENSE.rst %{pycryptodome}_LICENSE.rst
-
-# python-aliyun-sdk-core bundle
-tar -xzf %SOURCE9 -C %{bundled_lib_dir}
-mv %{bundled_lib_dir}/%{aliyunsdkcore}-%{aliyunsdkcore_version} %{aliyunsdkcore_dir}
-cp %{aliyunsdkcore_dir}/README.rst %{aliyunsdkcore}_README.rst
-
-# python-aliyun-sdk-ecs bundle
-tar -xzf %SOURCE10 -C %{bundled_lib_dir}
-mv %{bundled_lib_dir}/%{aliyunsdkecs}-%{aliyunsdkecs_version} %{aliyunsdkecs_dir}
-cp %{aliyunsdkecs_dir}/README.rst %{aliyunsdkecs}_README.rst
-
-# python-aliyun-sdk-vpc bundle
-tar -xzf %SOURCE11 -C %{bundled_lib_dir}
-mv %{bundled_lib_dir}/%{aliyunsdkvpc}-%{aliyunsdkvpc_version} %{aliyunsdkvpc_dir}
-cp %{aliyunsdkvpc_dir}/README.rst %{aliyunsdkvpc}_README.rst
-
-# fence_gce: append bundled-directory to search path
-%patch1000 -p1
-
-# python-google-api-client bundle
-pushd %{googleapiclient_dir}
-# remove egg info
-rm -rf google_api_python_client.egg-info
-# remove shebang without touching timestamp
-for lib in googleapiclient/*.py; do
- sed '1{\@^#!/usr/bin/python@d}' $lib > $lib.new &&
- touch -r $lib $lib.new &&
- mv $lib.new $lib
-done
-popd
-
-# python-oauth2client bundle
-pushd %{oauth2client_dir}
-%patch1001 -p1 -b .doc
-# replace python-rsa with python-cryptography
-%patch1002 -p1
-
-# Remove the version constraint on httplib2.  From reading upstream's git log,
-# it seems the only reason they require a new version is to force python3
-# support.  That doesn't affect us on EPEL7, so we can loosen the constraint.
-sed -i 's/httplib2>=0.9.1/httplib2/' setup.py
-
-# We do not have the package for google.appengine support
-# This is removed because it breaks the docs build otherwise
-rm -f docs/source/oauth2client.contrib.appengine.rst oauth2client/appengine.py
-popd
-
-# python-httplib2 bundle
-pushd %{httplib2_dir}
-%patch1003 -p1
-%patch1004 -p1
-%patch1005 -p1
-%patch1006 -p1
-%patch1007 -p1
-popd
-
-# python-keyring bundle
-pushd %{keyring_dir}
-%patch1008 -p1
-rm -frv keyring.egg-info
-# Drop redundant shebangs.
-sed -i '1{\@^#!/usr/bin/env python@d}' keyring/cli.py
-# Drop slags from upstream of using his own versioning system.
-sed -i -e "\@use_vcs_version@s/^.*$/\tversion = \"%{version}\",/g" \
-       -e "/'hgtools'/d" setup.py
-popd
-
-# python-gflags bundle
-pushd %{gflags_dir}
-sed -i '1s|^#!/usr/bin/env python$|#!%{__python2}|' gflags2man.py
-sed -i '/^#!\/usr\/bin\/env python$/,+1 d' gflags*.py
-popd
-
-# python-uritemplate bundle
-pushd %{uritemplate_dir}
-# remove egg info
-rm -rf uritemplate.egg-info
-popd
-%endif
 
 %build
 ./autogen.sh
 %{configure} --with-agents='%{supportedagents} %{testagents}'
 CFLAGS="$(echo '%{optflags}')" make %{_smp_mflags}
 
-%ifarch x86_64
-# python-google-api-client bundle
-pushd %{googleapiclient_dir}
-%{__python2} setup.py build
-popd
-
-# python-oauth2client bundle
-pushd %{oauth2client_dir}
-%{__python2} setup.py build
-popd
-
-# python-httplib2 bundle
-pushd %{httplib2_dir}
-%{__python2} setup.py build
-popd
-
-# python-fasteners bundle
-pushd %{fasteners_dir}
-%{__python2} setup.py build
-popd
-
-# python-keyring bundle
-pushd %{keyring_dir}
-%{__python2} setup.py build
-popd
-
-# python-gflags bundle
-pushd %{gflags_dir}
-%{__python2} setup.py build
-popd
-
-# python-uritemplate bundle
-pushd %{uritemplate_dir}
-%{__python2} setup.py build
-popd
-
-# python-pycryptodome bundle
-pushd %{pycryptodome_dir}
-%{__python2} setup.py build
-popd
-
-# python-aliyun-sdk-core bundle
-pushd %{aliyunsdkcore_dir}
-%{__python2} setup.py build
-popd
-
-# python-aliyun-sdk-ecs bundle
-pushd %{aliyunsdkecs_dir}
-%{__python2} setup.py build
-popd
-
-# python-aliyun-sdk-vpc bundle
-pushd %{aliyunsdkvpc_dir}
-%{__python2} setup.py build
-popd
-%endif
-
 %install
 rm -rf %{buildroot}
 make install DESTDIR=%{buildroot}
-
-%ifarch x86_64
-# python-google-api-client bundle
-pushd %{googleapiclient_dir}
-%{__python2} setup.py install -O1 --skip-build --root %{buildroot} --install-lib /usr/lib/fence-agents/%{bundled_lib_dir}/gce
-popd
-
-# python-oauth2client bundle
-pushd %{oauth2client_dir}
-%{__python2} setup.py install -O1 --skip-build --root %{buildroot} --install-lib /usr/lib/fence-agents/%{bundled_lib_dir}/gce
-popd
-
-# python-httplib2 bundle
-pushd %{httplib2_dir}
-%{__python2} setup.py install -O1 --skip-build --root %{buildroot} --install-lib /usr/lib/fence-agents/%{bundled_lib_dir}/gce
-popd
-
-# python-fasteners bundle
-pushd %{fasteners_dir}
-%{__python2} setup.py install -O1 --skip-build --root %{buildroot} --install-lib /usr/lib/fence-agents/%{bundled_lib_dir}/gce
-popd
-
-# python-keyring bundle
-pushd %{keyring_dir}
-%{__python2} setup.py install -O1 --skip-build --root %{buildroot} --install-lib /usr/lib/fence-agents/%{bundled_lib_dir}/gce
-popd
-
-# python-gflags bundle
-pushd %{gflags_dir}
-%{__python2} setup.py install -O1 --skip-build --root %{buildroot} --install-lib /usr/lib/fence-agents/%{bundled_lib_dir}/gce
-mv %{buildroot}%{_bindir}/gflags2man.py  %{buildroot}%{_bindir}/gflags2man
-chmod +x %{buildroot}%{_bindir}/gflags2man
-popd
-
-# python-uritemplate bundle
-pushd %{uritemplate_dir}
-%{__python2} setup.py install -O1 --skip-build --root %{buildroot} --install-lib /usr/lib/fence-agents/%{bundled_lib_dir}/gce
-popd
-
-# python-pycryptodome bundle
-pushd %{pycryptodome_dir}
-%{__python2} setup.py install -O1 --skip-build --root %{buildroot} --install-lib /usr/lib/fence-agents/%{bundled_lib_dir}/aliyun
-popd
-
-# python-aliyun-sdk-core bundle
-pushd %{aliyunsdkcore_dir}
-%{__python2} setup.py install -O1 --skip-build --root %{buildroot} --install-lib /usr/lib/fence-agents/%{bundled_lib_dir}/aliyun
-popd
-
-# python-aliyun-sdk-ecs bundle
-pushd %{aliyunsdkecs_dir}
-%{__python2} setup.py install -O1 --skip-build --root %{buildroot} --install-lib /usr/lib/fence-agents/%{bundled_lib_dir}/aliyun
-popd
-
-# python-aliyun-sdk-vpc bundle
-pushd %{aliyunsdkvpc_dir}
-%{__python2} setup.py install -O1 --skip-build --root %{buildroot} --install-lib /usr/lib/fence-agents/%{bundled_lib_dir}/aliyun
-popd
-%endif
 
 ## tree fix up
 # remove docs
@@ -487,34 +116,6 @@ Obsoletes: fence-agents < 3.1.13
 Red Hat Fence Agents is a collection of all supported fence agents.
 %files all
 
-%ifarch x86_64
-%package aliyun
-License: GPLv2+ and LGPLv2+ and ASL 2.0 and BSD and MIT
-Group: System Environment/Base
-Summary: Fence agent for Alibaba Cloud (Aliyun)
-Requires: fence-agents-common >= %{version}-%{release}
-# python-pycryptodome bundle
-Provides: bundled(python-%{pycryptodome}) = %{pycryptodome_version}
-# python-aliyun-sdk-core bundle
-Provides: bundled(python-aliyun-sdk-core) = %{aliyunsdkcore_version}
-# python-aliyun-sdk-ecs bundle
-Provides: bundled(python-aliyun-sdk-ecs) = %{aliyunsdkecs_version}
-# python-aliyun-sdk-vpc bundle
-Provides: bundled(python-aliyun-sdk-vpc) = %{aliyunsdkvpc_version}
-Obsoletes: fence-agents
-%description aliyun
-The fence-agents-aliyun package contains a fence agent for Alibaba Cloud (Aliyun) instances.
-%files aliyun
-%defattr(-,root,root,-)
-# bundled libraries
-%doc pycryptodome_README.rst aliyun*_README*
-%license pycryptodome_LICENSE.rst
-%{_sbindir}/fence_aliyun
-%{_mandir}/man8/fence_aliyun.8*
-# bundled libraries
-/usr/lib/fence-agents/%{bundled_lib_dir}/aliyun
-%endif
-
 %package amt-ws
 License: ASL 2.0
 Group: System Environment/Base
@@ -555,7 +156,9 @@ The fence-agents-apc-snmp package contains a fence agent for APC devices that ar
 %files apc-snmp
 %defattr(-,root,root,-)
 %{_sbindir}/fence_apc_snmp
+%{_sbindir}/fence_tripplite_snmp
 %{_mandir}/man8/fence_apc_snmp.8*
+%{_mandir}/man8/fence_tripplite_snmp.8*
 
 %ifarch x86_64
 %package aws
@@ -661,6 +264,20 @@ The fence-agents-compute package contains a fence agent for Nova compute nodes.
 %{_mandir}/man8/fence_compute.8*
 %{_mandir}/man8/fence_evacuate.8*
 
+%package docker
+License: GPLv2+ and LGPLv2+
+Group: System Environment/Base
+Summary: Fence agent for Docker
+Requires: pycurl
+Requires: fence-agents-common = %{version}-%{release}
+Obsoletes: fence-agents
+%description docker
+The fence-agents-docker package contains a fence agent for Docker images that are accessed over HTTP.
+%files docker
+%defattr(-,root,root,-)
+%{_sbindir}/fence_docker
+%{_mandir}/man8/fence_docker.8*
+
 %package drac5
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Base
@@ -714,41 +331,6 @@ The fence-agents-eps package contains a fence agent for ePowerSwitch 8M+ power s
 %defattr(-,root,root,-)
 %{_sbindir}/fence_eps
 %{_mandir}/man8/fence_eps.8*
-
-%ifarch x86_64
-%package gce
-License: GPLv2+ and LGPLv2+ and ASL 2.0 and BSD and MIT
-Group: System Environment/Base
-Summary: Fence agent for GCE (Google Cloud Engine)
-Requires: fence-agents-common >= %{version}-%{release}
-Requires: python-cryptography >= 1.7.2
-# python-google-api-client bundle
-Provides: bundled(python-google-api-client) = %{googleapiclient_version}
-# python-oauth2client bundle
-Provides: bundled(python-%{oauth2client}) = %{oauth2client_version}
-# python-httplib2 bundle
-Provides: bundled(python-%{httplib2}) = %{httplib2_version}
-# python-fasteners bundle
-Provides: bundled(python-%{fasteners}) = %{fasteners_version}
-# python-keyring bundle
-Provides: bundled(python-%{keyring}) = %{keyring_version}
-# python-uritemplate bundle
-Provides: bundled(python-%{uritemplate}) = %{uritemplate_version}
-Obsoletes: fence-agents
-%description gce
-The fence-agents-gce package contains a fence agent for GCE (Google Cloud Engine) instances.
-%files gce
-%defattr(-,root,root,-)
-# bundled libraries
-%doc %{oauth2client}_README.md %{fasteners}_README.rst %{keyring}_README.rst %{gflags}_README %{uritemplate}_README.rst
-%license %{googleapiclient}_LICENSE %{oauth2client}_LICENSE %{fasteners}_LICENSE %{uritemplate}_LICENSE*
-%{_sbindir}/fence_gce
-%{_mandir}/man8/fence_gce.8*
-# bundled libraries
-/usr/lib/fence-agents/%{bundled_lib_dir}/gce
-%exclude %{_bindir}/keyring
-%exclude %{_bindir}/gflags2man
-%endif
 
 %package heuristics-ping
 License: GPLv2+ and LGPLv2+
@@ -1063,10 +645,22 @@ The fence-agents-scsi package contains fence agent for SCSI persisent reservatio
 %files scsi
 %defattr(-,root,root,-)
 %{_sbindir}/fence_scsi
-%{_datadir}/cluster/fence_scsi_check.pl
 %{_datadir}/cluster/fence_scsi_check
 %{_datadir}/cluster/fence_scsi_check_hardreboot
 %{_mandir}/man8/fence_scsi.8*
+
+%package vbox
+License: GPLv2+ and LGPLv2+
+Group: System Environment/Base
+Summary: Fence agent for VirtualBox
+Requires: fence-agents-common >= %{version}-%{release}
+Obsoletes: fence-agents
+%description vbox
+The fence-agents-vbox package contains a fence agent for VirtualBox
+%files vbox
+%defattr(-,root,root,-)
+%{_sbindir}/fence_vbox
+%{_mandir}/man8/fence_vbox.8*
 
 %package virsh
 License: GPLv2+ and LGPLv2+
