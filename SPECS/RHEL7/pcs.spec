@@ -1,5 +1,5 @@
 Name: pcs
-Version: 0.9.166
+Version: 0.9.167
 Release: 1%{?dist}
 License: GPLv2
 URL: https://github.com/ClusterLabs/pcs
@@ -107,7 +107,7 @@ run_all_tests(){
   sitelib=$RPM_BUILD_ROOT%{python_sitelib}
   pcsd_dir=$RPM_BUILD_ROOT%{PCS_PREFIX}/lib/pcsd
 
-  find ${sitelib}/pcs -name test -type d -print0|xargs -0 rm -r -v --
+#  find ${sitelib}/pcs -name test -type d -print0|xargs -0 rm -r -v --
 
   #remove tests after use here to be symmetrical with pcs tests
   rm -r -v ${pcsd_dir}/test
@@ -164,6 +164,13 @@ rm -rf $RPM_BUILD_ROOT/usr/share/snmp
 %doc README.md
 
 %changelog
+* Thu Feb 28 2019 Ivan Devat <idevat@redhat.com> - 0.9.165-6.el7_6.1
+- `pcs` no longer spawns unnecessary processes for reading node tokens
+- Fixed a bug causing most of the messages not being logged into pcsd.log
+- Lower load caused by periodical config files syncing in pcsd by making it sync less frequently
+- Improve logging of periodical config files syncing in pcsd
+- Resolves: rhbz#1683959 rhbz#1683957 rhbz#1683958
+
 * Fri Aug 31 2018 Ondrej Mular <omular@redhat.com> - 0.9.165-6
 - Fix instance attributes setting for fence agents `fence_compute` and
   `fence_evacuate`
